@@ -32,7 +32,7 @@ MD-Notepad is a lightweight, desktop-friendly Markdown editor built with React +
 
 ## Contributing
 
-Feel free to open issues or PRs. Suggested improvements:
+Feel free to open issues or PRs
 
 ## License
 
