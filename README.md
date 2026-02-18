@@ -34,10 +34,6 @@ MD-Notepad is a lightweight, desktop-friendly Markdown editor built with React +
 
 Feel free to open issues or PRs. Suggested improvements:
 
-- Add persistent preferences (theme, last filename, editor width).
-- Export to HTML/PDF or copy-to-clipboard commands.
-- Add more robust Markdown features (frontmatter, image drag-and-drop, editor syntax highlighting).
-
 ## License
 
 MIT 2026 fevarto
