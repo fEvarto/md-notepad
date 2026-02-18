@@ -231,7 +231,7 @@ function App(): React.JSX.Element {
                 <a href="https://commonmark.org/help/" target="_blank" rel="noopener noreferrer">Markdown Guide →</a>
               </li>
               <li>
-                <a href="https://github.com/yourusername/md-notepad" target="_blank" rel="noopener noreferrer">GitHub Repository →</a>
+                <a href="https://github.com/fEvarto/md-notepad" target="_blank" rel="noopener noreferrer">GitHub Repository →</a>
               </li>
             </ul>
 
