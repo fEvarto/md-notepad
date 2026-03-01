@@ -1,0 +1,39 @@
+/* Settings form styles */
+.settings-group {
+  margin: 0.5rem 0 1rem 0;
+}
+
+.setting-item {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  cursor: pointer;
+  padding: 0.5rem 0;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.setting-item:hover {
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.checkbox-input {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  accent-color: #a8b5ff;
+}
+
+.checkbox-label {
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.settings-group small {
+  display: block;
+  margin-top: 0.25rem;
+  margin-left: 2.65rem;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.85rem;
+  line-height: 1.4;
+}

@@ -1,0 +1,29 @@
+/* Layout styles */
+.editor-app {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.editor-main {
+  display: flex;
+  gap: 0;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.separator {
+  width: 7px;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.04);
+  cursor: col-resize;
+  flex: 0 0 7px;
+  margin: 0 -3px;
+  transition: background 200ms ease;
+}
+
+.separator:hover {
+  background: rgba(255, 255, 255, 0.08);
+}

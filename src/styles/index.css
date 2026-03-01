@@ -1,0 +1,10 @@
+/* Main stylesheet - imports all component styles */
+@import './global.css';
+@import './layout.css';
+@import './toolbar.css';
+@import './editor.css';
+@import './modal.css';
+@import './collapsible.css';
+@import './theme.css';
+@import './settings.css';
+@import './responsive.css';

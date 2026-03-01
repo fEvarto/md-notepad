@@ -1,0 +1,80 @@
+/* Toolbar styles */
+.toolbar {
+  display: flex;
+  gap: 8px;
+  padding: 5px;
+  margin: 5px 5px 0 5px;
+  border-radius: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+  background: rgba(255, 255, 255, 0.08);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+}
+
+.toolbar .spacer {
+  flex: 1 1 auto;
+}
+
+.toolbar button {
+  padding: 0.4rem 0.8rem;
+  font-size: 0.95rem;
+  background: rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(212, 212, 212, 0.2);
+  border-radius: 6px;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  cursor: pointer;
+  transition: all 200ms ease;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  min-height: 44px;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.toolbar button:hover {
+  background: rgba(0, 0, 0, 0.2);
+  background-color: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 5px 15px rgba(255, 255, 255, 0.2);
+}
+
+.toolbar button:active {
+  transform: scale(0.98);
+}
+
+.toolbar button.primary {
+  background: rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(212, 212, 212, 0.2);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+
+.toolbar button.primary:hover {
+  background: rgba(0, 0, 0, 0.2);
+  background-color: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 5px 15px rgba(255, 255, 255, 0.2);
+}
+
+.toolbar button.primary:active {
+  transform: scale(0.98);
+}
+
+.filename-input {
+  padding: 0.4rem 0.6rem;
+  border-radius: 6px;
+  border: 1px solid rgba(212, 212, 212, 0.2);
+  background: rgba(0, 0, 0, 0.05);
+  color: inherit;
+  font-size: 0.95rem;
+  min-height: 30px;
+  transition: all 200ms ease;
+}
+
+.filename-input:focus {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.4);
+  background: rgba(0, 0, 0, 0.1);
+}

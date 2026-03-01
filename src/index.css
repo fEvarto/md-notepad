@@ -54,12 +54,6 @@ button:hover {
   border-color: rgba(100,108,255,0.5);
   box-shadow: 0 6px 25px rgba(100,108,255,0.2);
 }
-button:focus,
-button:focus-visible {
-  outline: none;
-  border-color: rgba(100,108,255,0.8);
-  box-shadow: 0 6px 25px rgba(100,108,255,0.3);
-}
 
 @media (prefers-color-scheme: light) {
   :root {
