@@ -6,14 +6,19 @@ interface InfoModalProps {
   onClose: () => void
   activeTab: 'settings' | 'tips' | 'info' | 'whatsnew'
   onTabChange: (tab: 'settings' | 'tips' | 'info' | 'whatsnew') => void
-  theme: 'light' | 'dark'
-  onThemeChange: (theme: 'light' | 'dark') => void
+  theme: 'system' | 'light' | 'dark'
+  onThemeChange: (theme: 'system' | 'light' | 'dark') => void
   highPerformance: boolean
   onHighPerformanceChange: (value: boolean) => void
   showBackdrop: boolean
   onShowBackdropChange: (value: boolean) => void
   showShadow: boolean
   onShowShadowChange: (value: boolean) => void
+  realTimePreview: boolean
+  onRealTimePreviewChange: (value: boolean) => void
+  previewMode: 'split' | 'separate'
+  onPreviewModeChange: (mode: 'split' | 'separate') => void
+  onResetToDefaults: () => void
 }
 
 export function InfoModal({
@@ -29,6 +34,11 @@ export function InfoModal({
   onShowBackdropChange,
   showShadow,
   onShowShadowChange,
+  realTimePreview,
+  onRealTimePreviewChange,
+  previewMode,
+  onPreviewModeChange,
+  onResetToDefaults,
 }: InfoModalProps): React.JSX.Element | null {
   const modalRef = useRef<HTMLDivElement | null>(null)
   const prevFocusedRef = useRef<HTMLElement | null>(null)
@@ -109,7 +119,32 @@ export function InfoModal({
         <div className="modal-content">
           {activeTab === 'whatsnew' && (
             <div className="tab-pane">
-              <CollapsibleSection title="March 2026 - The Accessibility Update (Current)" defaultOpen={true}>
+              <CollapsibleSection title="April 2026 - Keep Calm and Have a Fresh View (Current)" defaultOpen={true}>
+                <ul className="tips-list">
+                  <li>
+                    <span className="badge badge-major">Major</span>
+                    <strong>Separate preview:</strong> Added setting that changes preview to toggleable separate window for better accessibility and support for assistive technologies
+                  </li>
+                  <li>
+                    <span className="badge badge-major">Major</span>
+                    <strong>Disable live preview:</strong> Added settings that disables real-time preview for performance improvements on slower devices
+                  </li>
+                  <li>
+                    <span className="badge badge-improved">Improved</span>
+                    <strong>Default settings:</strong> Added default settings for new users and keep saved ones on each user's session
+                  </li>
+                  <li>
+                    <span className="badge badge-improved">Improved</span>
+                    <strong>System theme:</strong> Added system theme that repeats device's theme preference and applies it on app load
+                  </li>
+                  <li>
+                    <span className="badge badge-improved">Improved</span>
+                    <strong>Tweaks:</strong> Slightly tweaked some styles and fixed some minor bugs for better user experience
+                  </li>
+                </ul>
+              </CollapsibleSection>
+              
+              <CollapsibleSection title="March 2026 - The Accessibility Update">
                 <ul className="tips-list">
                   <li>
                     <span className="badge badge-major">Major</span>
@@ -169,14 +204,18 @@ export function InfoModal({
               <h3>Appearance</h3>
               <div className="settings-group">
                 <label className="setting-item">
-                  <input
-                    type="checkbox"
-                    checked={theme === 'light'}
-                    onChange={(e) => onThemeChange(e.target.checked ? 'light' : 'dark')}
-                    className="checkbox-input"
-                  />
-                  <span className="checkbox-label">Light Theme</span>
+                  <span className="checkbox-label" style={{ display: 'block', marginBottom: '0.5rem' }}>Theme</span>
+                  <select
+                    value={theme}
+                    onChange={(e) => onThemeChange(e.target.value as 'system' | 'light' | 'dark')}
+                    className="theme-select"
+                  >
+                    <option value="system">System Theme</option>
+                    <option value="light">Light Theme</option>
+                    <option value="dark">Dark Theme</option>
+                  </select>
                 </label>
+                <small>System Theme follows your device settings</small>
               </div>
 
               <h3>Performance</h3>
@@ -191,6 +230,45 @@ export function InfoModal({
                   <span className="checkbox-label">High Performance Mode</span>
                 </label>
                 <small>Reduces animations and visual effects for better performance on slower devices</small>
+              </div>
+
+              <h3>Preview Mode</h3>
+              <div className="settings-group">
+                <label className="setting-item">
+                  <input
+                    type="checkbox"
+                    checked={realTimePreview}
+                    onChange={(e) => onRealTimePreviewChange(e.target.checked)}
+                    className="checkbox-input"
+                  />
+                  <span className="checkbox-label">Real-Time Preview</span>
+                </label>
+                <small>When disabled, use the "Update Preview" button to refresh the rendered preview manually.</small>
+              </div>
+
+              <h3>Preview Layout</h3>
+              <div className="settings-group">
+                <label className="setting-item">
+                  <input
+                    type="radio"
+                    name="preview-mode"
+                    checked={previewMode === 'split'}
+                    onChange={() => onPreviewModeChange('split')}
+                    className="checkbox-input"
+                  />
+                  <span className="checkbox-label">Split view (Editor + Preview)</span>
+                </label>
+                <label className="setting-item">
+                  <input
+                    type="radio"
+                    name="preview-mode"
+                    checked={previewMode === 'separate'}
+                    onChange={() => onPreviewModeChange('separate')}
+                    className="checkbox-input"
+                  />
+                  <span className="checkbox-label">Separate preview window</span>
+                </label>
+                <small>Split mode shows editor and preview side-by-side. Separate mode swaps the main area between editor and preview using toolbar toggle button.</small>
               </div>
 
               <h3>Visual Styles</h3>
@@ -224,6 +302,19 @@ export function InfoModal({
                   <kbd>Esc</kbd> — Close this dialog
                 </li>
               </ul>
+
+              <h3>Reset Application</h3>
+              <p className="reset-description">Reset all settings to their default values.</p>
+              <button
+                className="reset-button"
+                onClick={() => {
+                  if (confirm('Are you sure? This will reset all settings to default values.')) {
+                    onResetToDefaults()
+                  }
+                }}
+              >
+                Reset to Defaults
+              </button>
             </div>
           )}
 

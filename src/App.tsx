@@ -9,12 +9,13 @@ function App(): React.JSX.Element {
   const [editorSize, setEditorSize] = useState<number>(60)
   const [showInfo, setShowInfo] = useState<boolean>(false)
   const [activeTab, setActiveTab] = useState<'settings' | 'tips' | 'info' | 'whatsnew'>('info')
-
+  const [previewValue, setPreviewValue] = useState<string>(value)
+  const [shownPane, setShownPane] = useState<'editor' | 'preview'>('editor')
   const textareaRef = useRef<HTMLTextAreaElement | null>(null)
   const containerRef = useRef<HTMLDivElement | null>(null)
 
   const { isColumnLayout } = useResponsiveLayout()
-  const { theme, highPerformance, showBackdrop, showShadow, setTheme, setHighPerformance, setShowBackdrop, setShowShadow } = useSettings()
+  const { theme, highPerformance, showBackdrop, showShadow, realTimePreview, previewMode, setTheme, setHighPerformance, setShowBackdrop, setShowShadow, setRealTimePreview, setPreviewMode, resetToDefaults } = useSettings()
   const { handleSeparatorMouseDown, handleSeparatorTouchStart } = useResizer(editorSize, setEditorSize, containerRef)
   const { applyWrap, applyLinePrefix, exportMarkdown } = useTextEditor(value, setValue, textareaRef)
 
@@ -36,6 +37,11 @@ function App(): React.JSX.Element {
         filename={filename}
         onFilenameChange={setFilename}
         onExport={exportMarkdown}
+        realTimePreview={realTimePreview}
+        onManualPreviewUpdate={() => setPreviewValue(value)}
+        previewMode={previewMode}
+        isPreviewActive={shownPane === 'preview'}
+        onSwitchPreviewPanel={() => setShownPane((prev) => (prev === 'editor' ? 'preview' : 'editor'))}
         onBold={() => applyWrap('**')}
         onItalic={() => applyWrap('*')}
         onCode={() => applyWrap('`')}
@@ -45,18 +51,37 @@ function App(): React.JSX.Element {
         onInfoClick={() => setShowInfo(true)}
       />
 
-      <Editor
-        value={value}
-        onChange={setValue}
-        editorSize={editorSize}
-        isColumnLayout={isColumnLayout}
-        textareaRef={textareaRef}
-        onSeparatorMouseDown={handleSeparatorMouseDown}
-        onSeparatorTouchStart={handleSeparatorTouchStart}
-        containerRef={containerRef}
-      >
-        <Preview value={value} editorSize={editorSize} isColumnLayout={isColumnLayout} />
-      </Editor>
+      {previewMode === 'split' ? (
+        <Editor
+          value={value}
+          onChange={setValue}
+          editorSize={editorSize}
+          isColumnLayout={isColumnLayout}
+          textareaRef={textareaRef}
+          onSeparatorMouseDown={handleSeparatorMouseDown}
+          onSeparatorTouchStart={handleSeparatorTouchStart}
+          containerRef={containerRef}
+          showSeparator={true}
+        >
+          <Preview value={realTimePreview ? value : previewValue} editorSize={editorSize} isColumnLayout={isColumnLayout} />
+        </Editor>
+      ) : shownPane === 'editor' ? (
+        <Editor
+          value={value}
+          onChange={setValue}
+          editorSize={editorSize}
+          isColumnLayout={isColumnLayout}
+          textareaRef={textareaRef}
+          onSeparatorMouseDown={handleSeparatorMouseDown}
+          onSeparatorTouchStart={handleSeparatorTouchStart}
+          containerRef={containerRef}
+          showSeparator={false}
+        />
+      ) : (
+        <div className="preview central">
+          <Preview value={realTimePreview ? value : previewValue} editorSize={editorSize} isColumnLayout={isColumnLayout} />
+        </div>
+      )}
 
       <InfoModal
         isOpen={showInfo}
@@ -74,6 +99,11 @@ function App(): React.JSX.Element {
         onShowBackdropChange={setShowBackdrop}
         showShadow={showShadow}
         onShowShadowChange={setShowShadow}
+        realTimePreview={realTimePreview}
+        onRealTimePreviewChange={setRealTimePreview}
+        previewMode={previewMode}
+        onPreviewModeChange={setPreviewMode}
+        onResetToDefaults={resetToDefaults}
       />
     </div>
   )

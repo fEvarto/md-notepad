@@ -9,6 +9,7 @@ interface EditorProps {
   onSeparatorMouseDown: (e: React.MouseEvent) => void
   onSeparatorTouchStart: (e: React.TouchEvent) => void
   containerRef: React.RefObject<HTMLDivElement | null>
+  showSeparator?: boolean
   children?: React.ReactNode
 }
 
@@ -21,6 +22,7 @@ export function Editor({
   onSeparatorMouseDown,
   onSeparatorTouchStart,
   containerRef,
+  showSeparator = true,
   children,
 }: EditorProps): React.JSX.Element {
   return (
@@ -44,13 +46,15 @@ export function Editor({
         spellCheck={false}
         aria-label="Markdown editor"
       />
-      <div
-        className="separator"
-        onMouseDown={onSeparatorMouseDown}
-        onTouchStart={onSeparatorTouchStart}
-        aria-label="Resize separator"
-        role="separator"
-      />
+      {showSeparator && (
+        <div
+          className="separator"
+          onMouseDown={onSeparatorMouseDown}
+          onTouchStart={onSeparatorTouchStart}
+          aria-label="Resize separator"
+          role="separator"
+        />
+      )}
       {children}
     </div>
   )

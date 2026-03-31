@@ -37,3 +37,34 @@
   font-size: 0.85rem;
   line-height: 1.4;
 }
+
+/* Theme select dropdown */
+.theme-select {
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  border: 1px solid rgba(212, 212, 212, 0.2);
+  background: rgba(0, 0, 0, 0.1);
+  color: inherit;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 200ms ease;
+  min-width: 180px;
+}
+
+.theme-select:hover {
+  background: rgba(0, 0, 0, 0.2);
+  border-color: rgba(212, 212, 212, 0.3);
+}
+
+.theme-select:focus {
+  outline: none;
+  border-color: rgba(168, 181, 255, 0.6);
+  background: rgba(0, 0, 0, 0.15);
+  box-shadow: 0 0 0 3px rgba(168, 181, 255, 0.15);
+}
+
+.theme-select option {
+  background: #1a1a1a;
+  color: #fff;
+  padding: 0.5rem;
+}

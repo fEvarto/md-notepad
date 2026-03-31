@@ -62,6 +62,21 @@
   transform: scale(0.98);
 }
 
+.toolbar button.secondary {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(180, 180, 180, 0.25);
+}
+
+.toolbar button.secondary:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.toolbar button.secondary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
 .filename-input {
   padding: 0.4rem 0.6rem;
   border-radius: 6px;
