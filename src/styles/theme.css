@@ -32,6 +32,12 @@
   color: #1a1a1a;
 }
 
+:root[data-theme="light"] .editor-line-numbers {
+  background: rgba(0, 0, 0, 0.04);
+  border-right-color: rgba(0, 0, 0, 0.1);
+  color: rgba(0, 0, 0, 0.35);
+}
+
 :root[data-theme="light"] .preview {
   background: #ffffff;
   color: #1a1a1a;

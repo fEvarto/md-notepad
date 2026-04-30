@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { Toolbar, Editor, Preview, InfoModal } from './components'
+import { Toolbar, Editor, Preview, InfoModal, StatusBar } from './components'
 import { useSettings, useResponsiveLayout, useResizer, useTextEditor } from './hooks'
 import './styles/index.css'
 
@@ -11,11 +11,12 @@ function App(): React.JSX.Element {
   const [activeTab, setActiveTab] = useState<'settings' | 'tips' | 'info' | 'whatsnew'>('info')
   const [previewValue, setPreviewValue] = useState<string>(value)
   const [shownPane, setShownPane] = useState<'editor' | 'preview'>('editor')
+  const [cursorPosition, setCursorPosition] = useState<number>(0)
   const textareaRef = useRef<HTMLTextAreaElement | null>(null)
   const containerRef = useRef<HTMLDivElement | null>(null)
 
   const { isColumnLayout } = useResponsiveLayout()
-  const { theme, highPerformance, showBackdrop, showShadow, realTimePreview, previewMode, setTheme, setHighPerformance, setShowBackdrop, setShowShadow, setRealTimePreview, setPreviewMode, resetToDefaults } = useSettings()
+  const { theme, highPerformance, showBackdrop, showShadow, realTimePreview, previewMode, spellCheck, showLineNumbers, setTheme, setHighPerformance, setShowBackdrop, setShowShadow, setRealTimePreview, setPreviewMode, setSpellCheck, setShowLineNumbers, resetToDefaults } = useSettings()
   const { handleSeparatorMouseDown, handleSeparatorTouchStart } = useResizer(editorSize, setEditorSize, containerRef)
   const { applyWrap, applyLinePrefix, exportMarkdown } = useTextEditor(value, setValue, textareaRef)
 
@@ -37,11 +38,6 @@ function App(): React.JSX.Element {
         filename={filename}
         onFilenameChange={setFilename}
         onExport={exportMarkdown}
-        realTimePreview={realTimePreview}
-        onManualPreviewUpdate={() => setPreviewValue(value)}
-        previewMode={previewMode}
-        isPreviewActive={shownPane === 'preview'}
-        onSwitchPreviewPanel={() => setShownPane((prev) => (prev === 'editor' ? 'preview' : 'editor'))}
         onBold={() => applyWrap('**')}
         onItalic={() => applyWrap('*')}
         onCode={() => applyWrap('`')}
@@ -62,6 +58,9 @@ function App(): React.JSX.Element {
           onSeparatorTouchStart={handleSeparatorTouchStart}
           containerRef={containerRef}
           showSeparator={true}
+          spellCheck={spellCheck}
+          showLineNumbers={showLineNumbers}
+          onCursorPositionChange={setCursorPosition}
         >
           <Preview value={realTimePreview ? value : previewValue} editorSize={editorSize} isColumnLayout={isColumnLayout} />
         </Editor>
@@ -76,8 +75,12 @@ function App(): React.JSX.Element {
           onSeparatorTouchStart={handleSeparatorTouchStart}
           containerRef={containerRef}
           showSeparator={false}
+          spellCheck={spellCheck}
+          showLineNumbers={showLineNumbers}
+          onCursorPositionChange={setCursorPosition}
         />
       ) : (
+
         <div className="preview central">
           <Preview value={realTimePreview ? value : previewValue} editorSize={editorSize} isColumnLayout={isColumnLayout} />
         </div>
@@ -103,7 +106,24 @@ function App(): React.JSX.Element {
         onRealTimePreviewChange={setRealTimePreview}
         previewMode={previewMode}
         onPreviewModeChange={setPreviewMode}
+        spellCheck={spellCheck}
+        onSpellCheckChange={setSpellCheck}
+        showLineNumbers={showLineNumbers}
+        onShowLineNumbersChange={setShowLineNumbers}
         onResetToDefaults={resetToDefaults}
+      />
+
+      <StatusBar
+        text={value}
+        filename={filename}
+        spellCheck={spellCheck}
+        cursorPosition={cursorPosition}
+        onSpellCheckToggle={() => setSpellCheck(!spellCheck)}
+        realTimePreview={realTimePreview}
+        onManualPreviewUpdate={() => setPreviewValue(value)}
+        previewMode={previewMode}
+        isPreviewActive={shownPane === 'preview'}
+        onSwitchPreviewPanel={() => setShownPane((prev) => (prev === 'editor' ? 'preview' : 'editor'))}
       />
     </div>
   )

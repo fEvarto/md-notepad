@@ -1,5 +1,7 @@
 import React from 'react'
 import ReactMarkdown from 'react-markdown'
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
+import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism'
 
 interface PreviewProps {
   value: string
@@ -28,7 +30,30 @@ export function Preview({
             }
       }
     >
-      <ReactMarkdown>{value}</ReactMarkdown>
+      <ReactMarkdown
+        components={{
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          code({ inline, className, children, ...props }: any) {
+            const match = /language-(\w+)/.exec(className || '')
+            return !inline && match ? (
+              <SyntaxHighlighter
+                style={oneDark}
+                language={match[1].toLowerCase()}
+                PreTag="div"
+                {...props}
+              >
+                {String(children).replace(/\n$/, '')}
+              </SyntaxHighlighter>
+            ) : (
+              <code className={className} {...props}>
+                {children}
+              </code>
+            )
+          },
+        }}
+      >
+        {value}
+      </ReactMarkdown>
     </div>
   )
 }

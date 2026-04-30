@@ -18,6 +18,10 @@ interface InfoModalProps {
   onRealTimePreviewChange: (value: boolean) => void
   previewMode: 'split' | 'separate'
   onPreviewModeChange: (mode: 'split' | 'separate') => void
+  spellCheck: boolean
+  onSpellCheckChange: (value: boolean) => void
+  showLineNumbers: boolean
+  onShowLineNumbersChange: (value: boolean) => void
   onResetToDefaults: () => void
 }
 
@@ -38,6 +42,10 @@ export function InfoModal({
   onRealTimePreviewChange,
   previewMode,
   onPreviewModeChange,
+  spellCheck,
+  onSpellCheckChange,
+  showLineNumbers,
+  onShowLineNumbersChange,
   onResetToDefaults,
 }: InfoModalProps): React.JSX.Element | null {
   const modalRef = useRef<HTMLDivElement | null>(null)
@@ -119,7 +127,36 @@ export function InfoModal({
         <div className="modal-content">
           {activeTab === 'whatsnew' && (
             <div className="tab-pane">
-              <CollapsibleSection title="April 2026 - Keep Calm and Have a Fresh View (Current)" defaultOpen={true}>
+              <CollapsibleSection title="May 2026 - The Spotlight Update (Current)" defaultOpen={true}>
+                <ul className="tips-list">
+                  <li>
+                    <span className="badge badge-major">Major</span>
+                    <strong>File info:</strong> Added information about the file that are currently in editing: word count, character count, estimated reading time, current line and column number and estimated file size
+                  </li>
+                  <li>
+                    <span className="badge badge-new">New</span>
+                    <strong>Vocabulary checking:</strong> Added setting that enables vocabulary spell-checking in editor
+                  </li>
+                  <li>
+                    <span className="badge badge-new">New</span>
+                    <strong>Line number column:</strong> Added a settings that enable a line number column like it's a code editor
+                  </li>
+                  <li>
+                    <span className="badge badge-improved">Improved</span>
+                    <strong>Mobile experience:</strong> Greatly improved experience for mobile users with previously added settings
+                  </li>
+                  <li>
+                    <span className="badge badge-improved">Improved</span>
+                    <strong>Code highlighting:</strong> Added highlights in the code blocks depending upon the programming language for better readability and aesthetics
+                  </li>
+                  <li>
+                    <span className="badge badge-improved">Improved</span>
+                    <strong>Tweaks:</strong> Slightly tweaked some styles and fixed some minor bugs for better user experience
+                  </li>
+                </ul>
+              </CollapsibleSection>
+              
+              <CollapsibleSection title="April 2026 - Keep Calm and Have a Fresh View">
                 <ul className="tips-list">
                   <li>
                     <span className="badge badge-major">Major</span>
@@ -290,6 +327,24 @@ export function InfoModal({
                     className="checkbox-input"
                   />
                   <span className="checkbox-label">Show Shadow Effects</span>
+                </label>
+                <label className="setting-item">
+                  <input
+                    type="checkbox"
+                    checked={spellCheck}
+                    onChange={(e) => onSpellCheckChange(e.target.checked)}
+                    className="checkbox-input"
+                  />
+                  <span className="checkbox-label">Enable Spell Checking</span>
+                </label>
+                <label className="setting-item">
+                  <input
+                    type="checkbox"
+                    checked={showLineNumbers}
+                    onChange={(e) => onShowLineNumbersChange(e.target.checked)}
+                    className="checkbox-input"
+                  />
+                  <span className="checkbox-label">Show Line Numbers</span>
                 </label>
               </div>
 

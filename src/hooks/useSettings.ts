@@ -7,6 +7,8 @@ interface Settings {
   showShadow: boolean
   realTimePreview: boolean
   previewMode: 'split' | 'separate'
+  spellCheck: boolean
+  showLineNumbers: boolean
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -15,7 +17,9 @@ export const DEFAULT_SETTINGS: Settings = {
   showBackdrop: true,
   showShadow: true,
   realTimePreview: true,
-  previewMode: 'split'
+  previewMode: 'split',
+  spellCheck: false,
+  showLineNumbers: false
 }
 
 const SETTINGS_KEY = 'md-notepad-settings'
@@ -27,6 +31,8 @@ export function useSettings(): Settings & {
   setShowShadow: (value: boolean) => void
   setRealTimePreview: (value: boolean) => void
   setPreviewMode: (mode: 'split' | 'separate') => void
+  setSpellCheck: (value: boolean) => void
+  setShowLineNumbers: (value: boolean) => void
   resetToDefaults: () => void
 } {
   const [theme, setThemeState] = useState<'system' | 'light' | 'dark'>(() => {
@@ -109,6 +115,32 @@ export function useSettings(): Settings & {
     return DEFAULT_SETTINGS.previewMode
   })
 
+  const [spellCheck, setSpellCheckState] = useState<boolean>(() => {
+    try {
+      const saved = localStorage.getItem(SETTINGS_KEY)
+      if (saved) {
+        const parsed = JSON.parse(saved) as Settings
+        return parsed.spellCheck ?? DEFAULT_SETTINGS.spellCheck
+      }
+    } catch (e) {
+      console.error('Failed to load settings:', e)
+    }
+    return DEFAULT_SETTINGS.spellCheck
+  })
+
+  const [showLineNumbers, setShowLineNumbersState] = useState<boolean>(() => {
+    try {
+      const saved = localStorage.getItem(SETTINGS_KEY)
+      if (saved) {
+        const parsed = JSON.parse(saved) as Settings
+        return parsed.showLineNumbers ?? DEFAULT_SETTINGS.showLineNumbers
+      }
+    } catch (e) {
+      console.error('Failed to load settings:', e)
+    }
+    return DEFAULT_SETTINGS.showLineNumbers
+  })
+
   // Helper function to save all settings to localStorage
   const saveSettings = (updatedSettings: Partial<Settings>) => {
     try {
@@ -141,6 +173,8 @@ export function useSettings(): Settings & {
     }
     document.documentElement.setAttribute('data-preview-sync', settings.realTimePreview ? 'realtime' : 'manual')
     document.documentElement.setAttribute('data-preview-mode', settings.previewMode)
+    document.documentElement.setAttribute('data-spell-check', settings.spellCheck ? 'enabled' : 'disabled')
+    document.documentElement.setAttribute('data-line-numbers', settings.showLineNumbers ? 'enabled' : 'disabled')
   }
 
   // Detect system theme preference and listen for changes
@@ -161,10 +195,10 @@ export function useSettings(): Settings & {
     saveSettings({ theme })
     const effectiveTheme = theme === 'system' ? systemPreference : theme
     applySettingsToDOM(
-      { theme, highPerformance, showBackdrop, showShadow, realTimePreview, previewMode },
+      { theme, highPerformance, showBackdrop, showShadow, realTimePreview, previewMode, spellCheck, showLineNumbers },
       effectiveTheme
     )
-  }, [theme, systemPreference, highPerformance, showBackdrop, showShadow, realTimePreview, previewMode])
+  }, [theme, systemPreference, highPerformance, showBackdrop, showShadow, realTimePreview, previewMode, spellCheck, showLineNumbers])
 
   const resetToDefaults = () => {
     setThemeState(DEFAULT_SETTINGS.theme)
@@ -173,6 +207,8 @@ export function useSettings(): Settings & {
     setShowShadowState(DEFAULT_SETTINGS.showShadow)
     setRealTimePreviewState(DEFAULT_SETTINGS.realTimePreview)
     setPreviewModeState(DEFAULT_SETTINGS.previewMode)
+    setSpellCheckState(DEFAULT_SETTINGS.spellCheck)
+    setShowLineNumbersState(DEFAULT_SETTINGS.showLineNumbers)
     localStorage.setItem(SETTINGS_KEY, JSON.stringify(DEFAULT_SETTINGS))
   }
 
@@ -183,6 +219,8 @@ export function useSettings(): Settings & {
     showShadow,
     realTimePreview,
     previewMode,
+    spellCheck,
+    showLineNumbers,
     setTheme: (newTheme: 'system' | 'light' | 'dark') => {
       setThemeState(newTheme)
       saveSettings({ theme: newTheme })
@@ -206,6 +244,14 @@ export function useSettings(): Settings & {
     setPreviewMode: (mode: 'split' | 'separate') => {
       setPreviewModeState(mode)
       saveSettings({ previewMode: mode })
+    },
+    setSpellCheck: (value: boolean) => {
+      setSpellCheckState(value)
+      saveSettings({ spellCheck: value })
+    },
+    setShowLineNumbers: (value: boolean) => {
+      setShowLineNumbersState(value)
+      saveSettings({ showLineNumbers: value })
     },
     resetToDefaults
   }

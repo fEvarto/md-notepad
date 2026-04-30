@@ -59,6 +59,16 @@
     min-width: 0;
   }
 
+  .editor-line-numbers {
+    padding: 1rem 0.4rem;
+    font-size: 14px;
+  }
+
+  .line-number {
+    font-size: 0.85em;
+    opacity: 0.5;
+  }
+
   .toolbar {
     gap: 4px;
     padding: 4px;
@@ -93,6 +103,10 @@
   .resources-list li {
     padding: 0.3rem 0;
     font-size: 0.9rem;
+  }
+
+  .editor-line-numbers {
+    display: none;
   }
 
   .toolbar {

@@ -11,11 +11,6 @@ interface ToolbarProps {
   onH2: () => void
   onList: () => void
   onInfoClick: () => void
-  realTimePreview: boolean
-  onManualPreviewUpdate: () => void
-  previewMode: 'split' | 'separate'
-  isPreviewActive: boolean
-  onSwitchPreviewPanel: () => void
 }
 
 export function Toolbar({
@@ -29,11 +24,6 @@ export function Toolbar({
   onH2,
   onList,
   onInfoClick,
-  realTimePreview,
-  onManualPreviewUpdate,
-  previewMode,
-  isPreviewActive,
-  onSwitchPreviewPanel,
 }: ToolbarProps): React.JSX.Element {
   return (
     <div className="toolbar">
@@ -66,24 +56,6 @@ export function Toolbar({
       <button className="primary" onClick={() => onExport(filename)}>
         Export
       </button>
-      {!realTimePreview && (
-        <button
-          className="secondary"
-          onClick={onManualPreviewUpdate}
-          title="Update preview manually"
-        >
-          Update Preview
-        </button>
-      )}
-      {previewMode === 'separate' && (
-        <button
-          className="secondary"
-          onClick={onSwitchPreviewPanel}
-          title={isPreviewActive ? 'Switch to Editor' : 'Switch to Preview'}
-        >
-          {isPreviewActive ? 'Show Editor' : 'Show Preview'}
-        </button>
-      )}
       <button title="Info" onClick={onInfoClick}>
         i
       </button>
