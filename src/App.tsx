@@ -20,17 +20,93 @@ function App(): React.JSX.Element {
   const { handleSeparatorMouseDown, handleSeparatorTouchStart } = useResizer(editorSize, setEditorSize, containerRef)
   const { applyWrap, applyLinePrefix, exportMarkdown } = useTextEditor(value, setValue, textareaRef)
 
-  // Handle keyboard shortcut for export
+  // Handle keyboard shortcuts for markdown actions and app commands
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
+      if (!e.ctrlKey && !e.metaKey) return
+
+      const key = e.key.toLowerCase()
+      const isEditorFocused = document.activeElement === textareaRef.current
+
+      // Keep native undo/redo behavior in the textarea
+      if (key === 'z' || key === 'y') {
+        return
+      }
+
+      if (key === 's' && !e.altKey) {
         e.preventDefault()
         exportMarkdown(filename)
+        return
+      }
+
+      if (isEditorFocused) {
+        if (key === 'b' && !e.altKey) {
+          e.preventDefault()
+          applyWrap('**')
+          return
+        }
+
+        if (key === 'i' && !e.altKey) {
+          e.preventDefault()
+          applyWrap('*')
+          return
+        }
+
+        if (key === 'k' && !e.altKey) {
+          e.preventDefault()
+          applyWrap('`')
+          return
+        }
+
+        if (e.altKey && key === '1') {
+          e.preventDefault()
+          applyLinePrefix('# ')
+          return
+        }
+
+        if (e.altKey && key === '2') {
+          e.preventDefault()
+          applyLinePrefix('## ')
+          return
+        }
+
+        if (e.altKey && key === 'l') {
+          e.preventDefault()
+          applyLinePrefix('- ')
+          return
+        }
+      }
+
+      if (e.altKey) {
+        if (key === 's') {
+          e.preventDefault()
+          setSpellCheck(!spellCheck)
+          return
+        }
+
+        if (key === 'n') {
+          e.preventDefault()
+          setShowLineNumbers(!showLineNumbers)
+          return
+        }
+
+        if (key === 'p' && previewMode === 'separate') {
+          e.preventDefault()
+          setShownPane((prev) => (prev === 'editor' ? 'preview' : 'editor'))
+          return
+        }
+
+        if (key === 'r') {
+          e.preventDefault()
+          setRealTimePreview(!realTimePreview)
+          return
+        }
       }
     }
+
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
-  }, [exportMarkdown, filename])
+  }, [applyWrap, applyLinePrefix, exportMarkdown, filename, spellCheck, setSpellCheck, showLineNumbers, setShowLineNumbers, previewMode, setShownPane, realTimePreview, setRealTimePreview])
 
   return (
     <div className="editor-app">

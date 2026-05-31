@@ -1,4 +1,5 @@
 import React from 'react'
+import { Tooltip } from './Tooltip'
 
 interface ToolbarProps {
   filename: string
@@ -29,21 +30,27 @@ export function Toolbar({
     <div className="toolbar">
       <button title="Bold (wrap selection)" onClick={onBold}>
         <b>B</b>
+        <Tooltip text="Bold (wrap selection)" keybind="Ctrl/Cmd+B" />
       </button>
       <button title="Italic (wrap selection)" onClick={onItalic}>
         <i>I</i>
+        <Tooltip text="Italic (wrap selection)" keybind="Ctrl/Cmd+I" />
       </button>
       <button title="Inline code" onClick={onCode}>
         Code
+        <Tooltip text="Inline code" keybind="Ctrl/Cmd+K" />
       </button>
       <button title="H1" onClick={onH1}>
         H1
+        <Tooltip text="Heading 1" keybind="Ctrl/Cmd+Alt+1" />
       </button>
       <button title="H2" onClick={onH2}>
         H2
+        <Tooltip text="Heading 2" keybind="Ctrl/Cmd+Alt+2" />
       </button>
       <button title="List" onClick={onList}>
         List
+        <Tooltip text="List item" keybind="Ctrl/Cmd+Alt+L" />
       </button>
       <div className="spacer" />
       <input
@@ -55,9 +62,11 @@ export function Toolbar({
       />
       <button className="primary" onClick={() => onExport(filename)}>
         Export
+        <Tooltip text="Export current note" keybind="Ctrl/Cmd+S" />
       </button>
       <button title="Info" onClick={onInfoClick}>
         i
+        <Tooltip text="Open settings" />
       </button>
     </div>
   )

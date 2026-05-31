@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { Tooltip } from './Tooltip'
 
 interface StatusBarProps {
   text: string
@@ -120,6 +121,7 @@ export function StatusBar({
               <path d="M20 20v-6h-6"></path>
               <path d="M5 19a9 9 0 1 1 0-14"></path>
             </svg>
+            <Tooltip text="Update preview manually" />
           </button>
         )}
 
@@ -142,6 +144,7 @@ export function StatusBar({
                 <circle cx="12" cy="12" r="3"></circle>
               </svg>
             )}
+            <Tooltip text={isPreviewActive ? 'Show Editor' : 'Show Preview'} keybind="Ctrl/Cmd+Alt+P" />
           </button>
         )}
 
@@ -165,6 +168,7 @@ export function StatusBar({
             <path d="M4 17h16"></path>
             <path d="M18 17l2 3 3-6"></path>
           </svg>
+          <Tooltip text={spellCheck ? 'Disable spell checking' : 'Enable spell checking'} keybind="Ctrl/Cmd+Alt+S" />
         </button>
 
         <div className="status-item status-filename">

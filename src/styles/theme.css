@@ -151,6 +151,12 @@
   border-color: rgba(30, 100, 200, 0.4);
 }
 
+:root[data-theme="light"] .badge-reworked {
+  background: linear-gradient(135deg, rgba(255, 43, 209, 0.305), rgba(227, 37, 230, 0.344));
+  color: #ffffff;
+  border-color: rgb(255, 107, 225);
+}
+
 :root[data-theme="light"] .badge-new {
   background: linear-gradient(135deg, rgba(50, 200, 100, 0.15), rgba(30, 150, 80, 0.15));
   color: #2d9970;

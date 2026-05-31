@@ -93,3 +93,56 @@
   border-color: rgba(255, 255, 255, 0.4);
   background: rgba(0, 0, 0, 0.1);
 }
+
+/* Tooltip styles for toolbar buttons */
+.toolbar button {
+  position: relative;
+}
+
+.toolbar .tooltip {
+  position: fixed;
+  background: rgba(20, 20, 20, 0.95);
+  color: #fff;
+  padding: 6px 8px;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 160ms ease, visibility 160ms;
+  z-index: 9999;
+  max-width: 280px;
+  box-sizing: border-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.toolbar .tooltip kbd {
+  margin-left: 8px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.06);
+  font-family: ui-monospace, monospace;
+  font-weight: 600;
+}
+
+.toolbar button:hover .tooltip,
+.toolbar button:focus .tooltip {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+@media (max-width: 600px) {
+  /* Hide tooltips on small screens to avoid obstructing UI */
+  .toolbar .tooltip {
+    display: none;
+  }
+}
+
+/* Ensure toolbar tooltips are readable in light theme */
+:root[data-theme="light"] .toolbar .tooltip {
+  background: rgba(30, 30, 30, 0.92);
+  color: #fff;
+}
+

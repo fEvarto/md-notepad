@@ -1,5 +1,6 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { CollapsibleSection } from './CollapsibleSection'
+import { getRandomTip, getRandomTipExcluding, type Tip } from '../data/tips'
 
 interface InfoModalProps {
   isOpen: boolean
@@ -50,6 +51,56 @@ export function InfoModal({
 }: InfoModalProps): React.JSX.Element | null {
   const modalRef = useRef<HTMLDivElement | null>(null)
   const prevFocusedRef = useRef<HTMLElement | null>(null)
+  const [currentTip, setCurrentTip] = useState<Tip>(getRandomTip())
+  const [currentCategory, setCurrentCategory] = useState<{ name: string; emoji: string }>({ 
+    name: 'Appearance', emoji: '' })
+
+  useEffect(() => {
+    // Generate a new random tip when tips tab is opened
+    if (activeTab === 'tips') {
+      const timer = setTimeout(() => {
+        setCurrentTip(prevTip => getRandomTipExcluding(prevTip))
+      }, 0)
+      return () => clearTimeout(timer)
+    }
+  }, [activeTab])
+
+  // Track current category based on scroll position
+  useEffect(() => {
+    if (activeTab !== 'settings') return
+
+    const handleScroll = (e: Event) => {
+      const target = e.target as HTMLElement
+      const pane = target.querySelector('.tab-pane') as HTMLElement
+      if (!pane) return
+
+      const categoryHeaders = pane.querySelectorAll('.settings-category-header h3')
+      let closestCategory = { name: 'Appearance', emoji: '' }
+      let closestDistance = Infinity
+
+      categoryHeaders.forEach((header) => {
+        const rect = header.getBoundingClientRect()
+        const distance = Math.abs(rect.top - 100) // Top offset from modal
+        if (distance < closestDistance && rect.top < 150) {
+          closestDistance = distance
+          const text = header.textContent || ''
+          // Extract emoji and name
+          const emojiMatch = text.match(/[\p{Emoji}]/u)
+          const emoji = emojiMatch ? emojiMatch[0] : '📋'
+          const name = text.replace(/[\p{Emoji}]/gu, '').trim()
+          closestCategory = { name, emoji }
+        }
+      })
+
+      setCurrentCategory(closestCategory)
+    }
+
+    const modal = modalRef.current
+    if (modal) {
+      modal.addEventListener('scroll', handleScroll, true)
+      return () => modal.removeEventListener('scroll', handleScroll, true)
+    }
+  }, [activeTab])
 
   useEffect(() => {
     if (!isOpen) return
@@ -127,7 +178,32 @@ export function InfoModal({
         <div className="modal-content">
           {activeTab === 'whatsnew' && (
             <div className="tab-pane">
-              <CollapsibleSection title="May 2026 - The Spotlight Update (Current)" defaultOpen={true}>
+              <CollapsibleSection title="June 2026 - The Key Update (Current)" defaultOpen={true}>
+                <ul className="tips-list">
+                  <li>
+                    <span className="badge badge-major">Major</span>
+                    <strong>More hotkeys:</strong> Added all major hotkeys for toolbar actions and export functionality. Details is shown in settings tab of this modal
+                  </li>
+                  <li>
+                    <span className="badge badge-new">New</span>
+                    <strong>Toolbar tooltips:</strong> Added tooltips for all toolbar buttons with hotkey hints for better discoverability of features and hotkeys
+                  </li>
+                  <li>
+                    <span className="badge badge-reworked">Reworked</span>
+                    <strong>Settings grouping:</strong> Improved settings organization by grouping them into categories and adding descriptions for better usability
+                  </li>
+                  <li>
+                    <span className="badge badge-reworked">Reworked</span>
+                    <strong>New tips page:</strong> Improved tips page: now it provides random tip for more comfortable app usage and better discoverability of features for new users
+                  </li>
+                  <li>
+                    <span className="badge badge-improved">Improved</span>
+                    <strong>Tweaks:</strong> Slightly tweaked some styles and fixed some minor bugs for better user experience
+                  </li>
+                </ul>
+              </CollapsibleSection>
+              
+              <CollapsibleSection title="May 2026 - The Spotlight Update">
                 <ul className="tips-list">
                   <li>
                     <span className="badge badge-major">Major</span>
@@ -238,7 +314,15 @@ export function InfoModal({
           )}
           {activeTab === 'settings' && (
             <div className="tab-pane">
-              <h3>Appearance</h3>
+              <div className="settings-sticky-header">
+                <div className="settings-current-category">
+                  <span className="category-name">{currentCategory.name}</span>
+                </div>
+              </div>
+              <div className="settings-category-header">
+                <h3 className="settings-category-title">Appearance</h3>
+                <p className="settings-category-desc">Customize theme, colors, and visual effects</p>
+              </div>
               <div className="settings-group">
                 <label className="setting-item">
                   <span className="checkbox-label" style={{ display: 'block', marginBottom: '0.5rem' }}>Theme</span>
@@ -267,6 +351,13 @@ export function InfoModal({
                   <span className="checkbox-label">High Performance Mode</span>
                 </label>
                 <small>Reduces animations and visual effects for better performance on slower devices</small>
+              </div>
+
+              <div className="settings-section-divider"></div>
+
+              <div className="settings-category-header">
+                <h3 className="settings-category-title">Preview</h3>
+                <p className="settings-category-desc">Control how markdown is previewed</p>
               </div>
 
               <h3>Preview Mode</h3>
@@ -348,10 +439,50 @@ export function InfoModal({
                 </label>
               </div>
 
+              <div className="settings-section-divider"></div>
+
+              <div className="settings-category-header">
+                <h3 className="settings-category-title">Editor</h3>
+                <p className="settings-category-desc">Customize editor behavior and display</p>
+              </div>
+
               <h3>Keyboard Shortcuts</h3>
               <ul className="shortcuts-list">
                 <li>
                   <kbd>Ctrl</kbd>/<kbd>Cmd</kbd>+<kbd>S</kbd> — Export as .md file
+                </li>
+                <li>
+                  <kbd>Ctrl</kbd>/<kbd>Cmd</kbd>+<kbd>B</kbd> — Bold selected text
+                </li>
+                <li>
+                  <kbd>Ctrl</kbd>/<kbd>Cmd</kbd>+<kbd>I</kbd> — Italicize selected text
+                </li>
+                <li>
+                  <kbd>Ctrl</kbd>/<kbd>Cmd</kbd>+<kbd>K</kbd> — Wrap selection in inline code
+                </li>
+                <li>
+                  <kbd>Ctrl</kbd>/<kbd>Cmd</kbd>+<kbd>Alt</kbd>+<kbd>1</kbd> — Apply H1 heading
+                </li>
+                <li>
+                  <kbd>Ctrl</kbd>/<kbd>Cmd</kbd>+<kbd>Alt</kbd>+<kbd>2</kbd> — Apply H2 heading
+                </li>
+                <li>
+                  <kbd>Ctrl</kbd>/<kbd>Cmd</kbd>+<kbd>Alt</kbd>+<kbd>L</kbd> — Create a list item
+                </li>
+                <li>
+                  <kbd>Ctrl</kbd>/<kbd>Cmd</kbd>+<kbd>Alt</kbd>+<kbd>S</kbd> — Toggle spell checking
+                </li>
+                <li>
+                  <kbd>Ctrl</kbd>/<kbd>Cmd</kbd>+<kbd>Alt</kbd>+<kbd>N</kbd> — Toggle line numbers
+                </li>
+                <li>
+                  <kbd>Ctrl</kbd>/<kbd>Cmd</kbd>+<kbd>Alt</kbd>+<kbd>P</kbd> — Toggle preview panel (separate mode only)
+                </li>
+                <li>
+                  <kbd>Ctrl</kbd>/<kbd>Cmd</kbd>+<kbd>Z</kbd> — Undo
+                </li>
+                <li>
+                  <kbd>Ctrl</kbd>/<kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>Z</kbd> — Redo
                 </li>
                 <li>
                   <kbd>Esc</kbd> — Close this dialog
@@ -375,43 +506,17 @@ export function InfoModal({
 
           {activeTab === 'tips' && (
             <div className="tab-pane">
-              <h3>Formatting Tips</h3>
-              <ul className="tips-list">
-                <li>
-                  <strong>Bold:</strong> Use <kbd>**text**</kbd>
-                </li>
-                <li>
-                  <strong>Italic:</strong> Use <kbd>*text*</kbd>
-                </li>
-                <li>
-                  <strong>Headings:</strong> Use <kbd>#</kbd>, <kbd>##</kbd>, <kbd>###</kbd> etc.
-                </li>
-                <li>
-                  <strong>Code:</strong> Wrap with backticks <kbd>`code`</kbd> or use code block button
-                </li>
-                <li>
-                  <strong>Lists:</strong> Start lines with <kbd>-</kbd> for bullet points
-                </li>
-              </ul>
-              <h3>Toolbar Buttons</h3>
-              <p>The toolbar provides quick access to common formatting options:</p>
-              <ul className="tips-list">
-                <li>
-                  <strong>B:</strong> Make selected text bold
-                </li>
-                <li>
-                  <strong>I:</strong> Make selected text italic
-                </li>
-                <li>
-                  <strong>Code:</strong> Wrap text in backticks
-                </li>
-                <li>
-                  <strong>H1-H2:</strong> Add heading styles
-                </li>
-                <li>
-                  <strong>List:</strong> Create bullet points
-                </li>
-              </ul>
+              <div className="tip-card">
+                <span className="tip-category">{currentTip.category}</span>
+                <h3 className="tip-title">{currentTip.title}</h3>
+                <p className="tip-content">{currentTip.content}</p>
+                <button
+                  className="tip-button"
+                  onClick={() => setCurrentTip(prev => getRandomTipExcluding(prev))}
+                >
+                  Get Another Tip
+                </button>
+              </div>
             </div>
           )}
 
