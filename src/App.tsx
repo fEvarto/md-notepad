@@ -3,8 +3,18 @@ import { Toolbar, Editor, Preview, InfoModal, StatusBar } from './components'
 import { useSettings, useResponsiveLayout, useResizer, useTextEditor } from './hooks'
 import './styles/index.css'
 
+// Load editor content from localStorage or return default
+function getInitialEditorContent(): string {
+  try {
+    const saved = localStorage.getItem('md-notepad-content')
+    return saved || '# Welcome to MD-Notepad\n\nStart typing *your* **markdown** ***here***...\n\n`console.log("Hello World")`'
+  } catch {
+    return '# Welcome to MD-Notepad\n\nStart typing *your* **markdown** ***here***...\n\n`console.log("Hello World")`'
+  }
+}
+
 function App(): React.JSX.Element {
-  const [value, setValue] = useState<string>('# Welcome to MD-Notepad\n\nStart typing *your* **markdown** ***here***...\n\n`console.log("Hello World")`')
+  const [value, setValue] = useState<string>(getInitialEditorContent())
   const [filename, setFilename] = useState<string>('note.md')
   const [editorSize, setEditorSize] = useState<number>(60)
   const [showInfo, setShowInfo] = useState<boolean>(false)
@@ -12,13 +22,29 @@ function App(): React.JSX.Element {
   const [previewValue, setPreviewValue] = useState<string>(value)
   const [shownPane, setShownPane] = useState<'editor' | 'preview'>('editor')
   const [cursorPosition, setCursorPosition] = useState<number>(0)
+  const [wrapToggleFeedback, setWrapToggleFeedback] = useState<'bold' | 'italic' | 'code' | null>(null)
   const textareaRef = useRef<HTMLTextAreaElement | null>(null)
   const containerRef = useRef<HTMLDivElement | null>(null)
 
   const { isColumnLayout } = useResponsiveLayout()
-  const { theme, highPerformance, showBackdrop, showShadow, realTimePreview, previewMode, spellCheck, showLineNumbers, setTheme, setHighPerformance, setShowBackdrop, setShowShadow, setRealTimePreview, setPreviewMode, setSpellCheck, setShowLineNumbers, resetToDefaults } = useSettings()
+  const { theme, highPerformance, showBackdrop, showShadow, realTimePreview, previewMode, spellCheck, showLineNumbers, accentColor, setTheme, setHighPerformance, setShowBackdrop, setShowShadow, setRealTimePreview, setPreviewMode, setSpellCheck, setShowLineNumbers, setAccentColor, resetToDefaults } = useSettings()
   const { handleSeparatorMouseDown, handleSeparatorTouchStart } = useResizer(editorSize, setEditorSize, containerRef)
-  const { applyWrap, applyLinePrefix, exportMarkdown } = useTextEditor(value, setValue, textareaRef)
+  const { applyWrap, toggleWrap, applyLinePrefix, exportMarkdown } = useTextEditor(value, setValue, textareaRef)
+
+  // Save editor content to localStorage whenever it changes
+  useEffect(() => {
+    try {
+      localStorage.setItem('md-notepad-content', value)
+    } catch {
+      // Silently fail if localStorage is unavailable (quota exceeded, etc.)
+    }
+  }, [value])
+
+  useEffect(() => {
+    if (!wrapToggleFeedback) return
+    const timeout = window.setTimeout(() => setWrapToggleFeedback(null), 280)
+    return () => window.clearTimeout(timeout)
+  }, [wrapToggleFeedback])
 
   // Handle keyboard shortcuts for markdown actions and app commands
   useEffect(() => {
@@ -114,13 +140,23 @@ function App(): React.JSX.Element {
         filename={filename}
         onFilenameChange={setFilename}
         onExport={exportMarkdown}
-        onBold={() => applyWrap('**')}
-        onItalic={() => applyWrap('*')}
-        onCode={() => applyWrap('`')}
+        onBold={() => {
+          const didRemove = toggleWrap('**')
+          if (didRemove) setWrapToggleFeedback('bold')
+        }}
+        onItalic={() => {
+          const didRemove = toggleWrap('*')
+          if (didRemove) setWrapToggleFeedback('italic')
+        }}
+        onCode={() => {
+          const didRemove = toggleWrap('`')
+          if (didRemove) setWrapToggleFeedback('code')
+        }}
         onH1={() => applyLinePrefix('# ')}
         onH2={() => applyLinePrefix('## ')}
         onList={() => applyLinePrefix('- ')}
         onInfoClick={() => setShowInfo(true)}
+        wrapToggleFeedback={wrapToggleFeedback}
       />
 
       {previewMode === 'split' ? (
@@ -186,6 +222,8 @@ function App(): React.JSX.Element {
         onSpellCheckChange={setSpellCheck}
         showLineNumbers={showLineNumbers}
         onShowLineNumbersChange={setShowLineNumbers}
+        accentColor={accentColor}
+        onAccentColorChange={setAccentColor}
         onResetToDefaults={resetToDefaults}
       />
 

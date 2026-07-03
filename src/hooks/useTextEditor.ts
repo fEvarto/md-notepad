@@ -6,6 +6,7 @@ export function useTextEditor(
   textareaRef: React.RefObject<HTMLTextAreaElement | null>
 ): {
   applyWrap: (before: string, after?: string) => void
+  toggleWrap: (before: string, after?: string) => boolean
   applyLinePrefix: (prefix: string) => void
   exportMarkdown: (filename?: string) => void
 } {
@@ -26,6 +27,40 @@ export function useTextEditor(
       ta.setSelectionRange(newStart, newEnd)
     })
   }, [value, setValue, textareaRef])
+
+  const toggleWrap = useCallback((before: string, after?: string) => {
+    const ta = textareaRef.current
+    if (!ta) return false
+
+    const start = ta.selectionStart
+    const end = ta.selectionEnd
+    if (start === end) {
+      applyWrap(before, after)
+      return false
+    }
+
+    const selected = value.slice(start, end)
+    const close = after ?? before
+    const hasMatchingWrap = start >= before.length && end + close.length <= value.length && value.slice(start - before.length, start) === before && value.slice(end, end + close.length) === close
+
+    if (hasMatchingWrap) {
+      const newText = value.slice(0, start - before.length) + selected + value.slice(end + close.length)
+      setValue(newText)
+
+      requestAnimationFrame(() => {
+        if (!ta) return
+        const newStart = start - before.length
+        const newEnd = newStart + selected.length
+        ta.focus()
+        ta.setSelectionRange(newStart, newEnd)
+      })
+
+      return true
+    }
+
+    applyWrap(before, after)
+    return false
+  }, [value, setValue, textareaRef, applyWrap])
 
   const applyLinePrefix = useCallback((prefix: string) => {
     const ta = textareaRef.current
@@ -59,6 +94,7 @@ export function useTextEditor(
 
   return {
     applyWrap,
+    toggleWrap,
     applyLinePrefix,
     exportMarkdown,
   }

@@ -1,3 +1,34 @@
+/* Accent color variables */
+:root {
+  --accent-primary: #4a9eff;
+  --accent-dark: #0051ba;
+}
+
+:root[data-accent-color="red"] {
+  --accent-primary: #ff6b6b;
+  --accent-dark: #dc3545;
+}
+
+:root[data-accent-color="blue"] {
+  --accent-primary: #4a9eff;
+  --accent-dark: #0051ba;
+}
+
+:root[data-accent-color="green"] {
+  --accent-primary: #51cf66;
+  --accent-dark: #2f9e44;
+}
+
+:root[data-accent-color="purple"] {
+  --accent-primary: #b197fc;
+  --accent-dark: #7c3aed;
+}
+
+:root[data-accent-color="orange"] {
+  --accent-primary: #ff922b;
+  --accent-dark: #f76707;
+}
+
 /* Light theme styles */
 :root[data-theme="dark"] {
   color-scheme: dark;

@@ -75,7 +75,7 @@
   }
 
   .toolbar button {
-    padding: 0.35rem 0.6rem;
+    padding: 0.3rem 0.3rem;
     font-size: 0.8rem;
   }
 
@@ -115,14 +115,14 @@
   }
 
   .toolbar button {
-    padding: 0.3rem 0.5rem;
+    padding: 0.3rem 0.3rem;
     font-size: 0.7rem;
     min-height: 40px;
   }
 
   .filename-input {
     width: 55px;
-    padding: 0.3rem 0.4rem;
+    padding: 0.3rem 0.3rem;
     font-size: 0.7rem;
   }
 

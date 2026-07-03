@@ -49,6 +49,10 @@
   font-size: 0.95rem;
   transition: all 200ms ease;
   margin-bottom: 5px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  border-radius: 999px;
 }
 
 .tab-button:hover {
@@ -58,7 +62,8 @@
 .tab-button.active {
   color: rgba(255, 255, 255, 1);
   border: 1px solid rgba(212, 212, 212, 0.2);
-  border-bottom: 3px solid rgba(212, 212, 212, 0.2);
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
 }
 
 .modal-content {
@@ -82,6 +87,10 @@
   margin: 1.25rem 0 0.5rem 0;
   font-size: 1.1rem;
   color: rgba(255, 255, 255, 0.9);
+}
+
+.tab-button-icon {
+  opacity: 0.9;
 }
 
 .modal p {
@@ -136,14 +145,14 @@ kbd + kbd {
 }
 
 .modal a {
-  color: #a8b5ff;
+  color: var(--accent-primary, #a8b5ff);
   text-decoration: none;
   border-bottom: 1px solid rgba(168, 181, 255, 0.3);
   transition: all 200ms ease;
 }
 
 .modal a:hover {
-  color: #c4d1ff;
+  color: var(--accent-primary, #c4d1ff);
   border-bottom-color: rgba(196, 209, 255, 0.6);
 }
 
@@ -240,7 +249,7 @@ kbd + kbd {
   width: 1.2rem;
   height: 1.2rem;
   cursor: pointer;
-  accent-color: #a8b5ff;
+  accent-color: var(--accent-primary, #a8b5ff);
 }
 
 .checkbox-label {
@@ -265,6 +274,67 @@ kbd + kbd {
   border-color: rgba(255, 255, 255, 0.4);
   background: rgba(255, 255, 255, 0.08);
   outline: none;
+}
+
+/* Accent Color Selector */
+.accent-color-selector {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.accent-color-option {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all 200ms ease;
+  position: relative;
+}
+
+.accent-color-option.accent-red {
+  background: linear-gradient(135deg, #ff6b6b, #dc3545);
+}
+
+.accent-color-option.accent-blue {
+  background: linear-gradient(135deg, #4a9eff, #0051ba);
+}
+
+.accent-color-option.accent-green {
+  background: linear-gradient(135deg, #51cf66, #2f9e44);
+}
+
+.accent-color-option.accent-purple {
+  background: linear-gradient(135deg, #b197fc, #7c3aed);
+}
+
+.accent-color-option.accent-orange {
+  background: linear-gradient(135deg, #ff922b, #f76707);
+}
+
+.accent-color-option:hover {
+  transform: scale(1.1);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.accent-color-option.active {
+  border-color: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.3), inset 0 0 0 2px rgba(255, 255, 255, 0.95);
+}
+
+.accent-color-option.active::after {
+  content: '✓';
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+  font-size: 1.2rem;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 /* Settings Category Header */
@@ -309,7 +379,7 @@ kbd + kbd {
 
 .settings-category-header {
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.06));
-  border-left: 4px solid rgba(255, 255, 255, 0.4);
+  border-left: 4px solid var(--accent-primary, rgba(255, 255, 255, 0.4));
   padding: 0.2rem 1rem;
   margin: 0.75rem 0 0.5rem 0;
   border-radius: 8px;
@@ -336,7 +406,7 @@ kbd + kbd {
   height: 1px;
   background: linear-gradient(90deg, 
     transparent, 
-    rgba(168, 181, 255, 0.2), 
+    var(--accent-primary, rgba(168, 181, 255, 0.2)), 
     transparent);
   margin: 1.5rem 0;
   border: none;
@@ -417,7 +487,7 @@ kbd + kbd {
 /* Tip Card Styles */
 .tip-card {
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.06));
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid var(--accent-primary, rgba(255, 255, 255, 0.2));
   border-radius: 12px;
   padding: 2rem;
   margin: 1.5rem 0;
@@ -432,7 +502,7 @@ kbd + kbd {
 
 .tip-card:hover {
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.1));
-  border-color: rgba(255, 255, 255, 0.35);
+  border-color: var(--accent-primary, rgba(255, 255, 255, 0.35));
   box-shadow: 0 8px 30px rgba(168, 181, 255, 0.1);
 }
 
@@ -451,7 +521,7 @@ kbd + kbd {
   display: inline-block;
   padding: 0.4rem 0.8rem;
   background: rgba(255, 255, 255, 0.15);
-  color: #ffffff;
+  color: var(--accent-primary, #ffffff);
   border-radius: 6px;
   font-size: 0.8rem;
   font-weight: 600;

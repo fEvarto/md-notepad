@@ -1,6 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { CollapsibleSection } from './CollapsibleSection'
 import { getRandomTip, getRandomTipExcluding, type Tip } from '../data/tips'
+import { patchNotes } from '../data/patchNotes'
+import { type AccentColor } from '../hooks/useSettings'
+import { InfoInIcon, LightbulbIcon, SettingsIcon, SparklesIcon } from './Icons'
 
 interface InfoModalProps {
   isOpen: boolean
@@ -23,6 +26,8 @@ interface InfoModalProps {
   onSpellCheckChange: (value: boolean) => void
   showLineNumbers: boolean
   onShowLineNumbersChange: (value: boolean) => void
+  accentColor: AccentColor
+  onAccentColorChange: (color: AccentColor) => void
   onResetToDefaults: () => void
 }
 
@@ -47,6 +52,8 @@ export function InfoModal({
   onSpellCheckChange,
   showLineNumbers,
   onShowLineNumbersChange,
+  accentColor,
+  onAccentColorChange,
   onResetToDefaults,
 }: InfoModalProps): React.JSX.Element | null {
   const modalRef = useRef<HTMLDivElement | null>(null)
@@ -147,7 +154,10 @@ export function InfoModal({
             aria-selected={activeTab === 'settings'}
             role="tab"
           >
-            Settings
+            <span className="tab-button-icon" aria-hidden="true">
+              <SettingsIcon />
+            </span>
+            <span>Settings</span>
           </button>
           <button
             className={`tab-button ${activeTab === 'tips' ? 'active' : ''}`}
@@ -155,7 +165,10 @@ export function InfoModal({
             aria-selected={activeTab === 'tips'}
             role="tab"
           >
-            Tips
+            <span className="tab-button-icon" aria-hidden="true">
+              <LightbulbIcon />
+            </span>
+            <span>Tips</span>
           </button>
           <button
             className={`tab-button ${activeTab === 'info' ? 'active' : ''}`}
@@ -163,7 +176,10 @@ export function InfoModal({
             aria-selected={activeTab === 'info'}
             role="tab"
           >
-            Info
+            <span className="tab-button-icon" aria-hidden="true">
+              <InfoInIcon />
+            </span>
+            <span>Info</span>
           </button>
           <button
             className={`tab-button ${activeTab === 'whatsnew' ? 'active' : ''}`}
@@ -171,145 +187,35 @@ export function InfoModal({
             aria-selected={activeTab === 'whatsnew'}
             role="tab"
           >
-            What's New
+            <span className="tab-button-icon" aria-hidden="true">
+              <SparklesIcon />
+            </span>
+            <span>What's New</span>
           </button>
         </div>
 
         <div className="modal-content">
           {activeTab === 'whatsnew' && (
             <div className="tab-pane">
-              <CollapsibleSection title="June 2026 - The Key Update (Current)" defaultOpen={true}>
-                <ul className="tips-list">
-                  <li>
-                    <span className="badge badge-major">Major</span>
-                    <strong>More hotkeys:</strong> Added all major hotkeys for toolbar actions and export functionality. Details is shown in settings tab of this modal
-                  </li>
-                  <li>
-                    <span className="badge badge-new">New</span>
-                    <strong>Toolbar tooltips:</strong> Added tooltips for all toolbar buttons with hotkey hints for better discoverability of features and hotkeys
-                  </li>
-                  <li>
-                    <span className="badge badge-reworked">Reworked</span>
-                    <strong>Settings grouping:</strong> Improved settings organization by grouping them into categories and adding descriptions for better usability
-                  </li>
-                  <li>
-                    <span className="badge badge-reworked">Reworked</span>
-                    <strong>New tips page:</strong> Improved tips page: now it provides random tip for more comfortable app usage and better discoverability of features for new users
-                  </li>
-                  <li>
-                    <span className="badge badge-improved">Improved</span>
-                    <strong>Tweaks:</strong> Slightly tweaked some styles and fixed some minor bugs for better user experience
-                  </li>
-                </ul>
-              </CollapsibleSection>
-              
-              <CollapsibleSection title="May 2026 - The Spotlight Update">
-                <ul className="tips-list">
-                  <li>
-                    <span className="badge badge-major">Major</span>
-                    <strong>File info:</strong> Added information about the file that are currently in editing: word count, character count, estimated reading time, current line and column number and estimated file size
-                  </li>
-                  <li>
-                    <span className="badge badge-new">New</span>
-                    <strong>Vocabulary checking:</strong> Added setting that enables vocabulary spell-checking in editor
-                  </li>
-                  <li>
-                    <span className="badge badge-new">New</span>
-                    <strong>Line number column:</strong> Added a settings that enable a line number column like it's a code editor
-                  </li>
-                  <li>
-                    <span className="badge badge-improved">Improved</span>
-                    <strong>Mobile experience:</strong> Greatly improved experience for mobile users with previously added settings
-                  </li>
-                  <li>
-                    <span className="badge badge-improved">Improved</span>
-                    <strong>Code highlighting:</strong> Added highlights in the code blocks depending upon the programming language for better readability and aesthetics
-                  </li>
-                  <li>
-                    <span className="badge badge-improved">Improved</span>
-                    <strong>Tweaks:</strong> Slightly tweaked some styles and fixed some minor bugs for better user experience
-                  </li>
-                </ul>
-              </CollapsibleSection>
-              
-              <CollapsibleSection title="April 2026 - Keep Calm and Have a Fresh View">
-                <ul className="tips-list">
-                  <li>
-                    <span className="badge badge-major">Major</span>
-                    <strong>Separate preview:</strong> Added setting that changes preview to toggleable separate window for better accessibility and support for assistive technologies
-                  </li>
-                  <li>
-                    <span className="badge badge-major">Major</span>
-                    <strong>Disable live preview:</strong> Added settings that disables real-time preview for performance improvements on slower devices
-                  </li>
-                  <li>
-                    <span className="badge badge-improved">Improved</span>
-                    <strong>Default settings:</strong> Added default settings for new users and keep saved ones on each user's session
-                  </li>
-                  <li>
-                    <span className="badge badge-improved">Improved</span>
-                    <strong>System theme:</strong> Added system theme that repeats device's theme preference and applies it on app load
-                  </li>
-                  <li>
-                    <span className="badge badge-improved">Improved</span>
-                    <strong>Tweaks:</strong> Slightly tweaked some styles and fixed some minor bugs for better user experience
-                  </li>
-                </ul>
-              </CollapsibleSection>
-              
-              <CollapsibleSection title="March 2026 - The Accessibility Update">
-                <ul className="tips-list">
-                  <li>
-                    <span className="badge badge-major">Major</span>
-                    <strong>The Great Modal Split:</strong> Modal window has been split into four distinct tabs for better organization and easier navigation
-                  </li>
-                  <li>
-                    <span className="badge badge-major">Major</span>
-                    <strong>Settings:</strong> Added settings that improves accessibility and performance, including a new light theme, high performance mode, and visual customization options
-                  </li>
-                  <li>
-                    <span className="badge badge-new">New</span>
-                    <strong>Patch notes:</strong> Added patch for better informing users about new features and improvements in each release. Info lies in the "What's New" tab of the info modal
-                  </li>
-                  <li>
-                    <span className="badge badge-new">New</span>
-                    <strong>Visual Customization:</strong> Toggle backdrop blur and shadow effects
-                  </li>
-                  <li>
-                    <span className="badge badge-improved">Improved</span>
-                    <strong>Code Organization:</strong> Software architecture split into focused module files for better maintenance
-                  </li>
-                  <li>
-                    <span className="badge badge-improved">Improved</span>
-                    <strong>Style changes:</strong> Some Markdown styles have been tweaked for better readability and aesthetics, including headings, code blocks, blockquotes, and tables
-                  </li>
-                </ul>
-              </CollapsibleSection>
-
-              <CollapsibleSection title="February 2026 - Initial Release">
-                <ul className="tips-list">
-                  <li>
-                    <span className="badge badge-new">New</span>
-                    <strong>Live Preview:</strong> Real-time Markdown rendering
-                  </li>
-                  <li>
-                    <span className="badge badge-new">New</span>
-                    <strong>Resizable Panes:</strong> Drag separator to adjust editor/preview sizes
-                  </li>
-                  <li>
-                    <span className="badge badge-new">New</span>
-                    <strong>Touch Support:</strong> Mobile-friendly pane resizing
-                  </li>
-                  <li>
-                    <span className="badge badge-new">New</span>
-                    <strong>Export Functionality:</strong> Download notes as .md files
-                  </li>
-                  <li>
-                    <span className="badge badge-new">New</span>
-                    <strong>Responsive Design:</strong> Works on desktop and mobile devices
-                  </li>
-                </ul>
-              </CollapsibleSection>
+              {patchNotes.map((patch) => (
+                <CollapsibleSection 
+                  key={patch.version} 
+                  title={`${patch.title}${patch.date ? ` (${patch.date})` : ''}`}
+                  defaultOpen={patch.defaultOpen || false}
+                >
+                  <ul className="tips-list">
+                    {patch.entries.map((entry, idx) => (
+                      <li key={idx}>
+                        <span className={`badge badge-${entry.badge}`}>
+                          {entry.badge.charAt(0).toUpperCase() + entry.badge.slice(1)}
+                        </span>
+                        <strong>{entry.title}</strong>
+                        {entry.description && ` ${entry.description}`}
+                      </li>
+                    ))}
+                  </ul>
+                </CollapsibleSection>
+              ))}
             </div>
           )}
           {activeTab === 'settings' && (
@@ -337,6 +243,22 @@ export function InfoModal({
                   </select>
                 </label>
                 <small>System Theme follows your device settings</small>
+
+                <label className="setting-item" style={{ marginTop: '1rem' }}>
+                  <span className="checkbox-label" style={{ display: 'block', marginBottom: '0.5rem' }}>Accent Color</span>
+                  <div className="accent-color-selector">
+                    {(['red', 'blue', 'green', 'purple', 'orange'] as const).map((color) => (
+                      <button
+                        key={color}
+                        className={`accent-color-option accent-${color} ${accentColor === color ? 'active' : ''}`}
+                        onClick={() => onAccentColorChange(color)}
+                        title={color.charAt(0).toUpperCase() + color.slice(1)}
+                        aria-label={color}
+                      />
+                    ))}
+                  </div>
+                </label>
+                <small>Choose an accent color for app highlights and interactive elements</small>
               </div>
 
               <h3>Performance</h3>
