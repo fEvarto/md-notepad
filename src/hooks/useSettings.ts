@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { readJSON, writeJSON } from '../utils'
 
 export type AccentColor = 'red' | 'blue' | 'green' | 'purple' | 'orange'
 
@@ -28,6 +29,11 @@ export const DEFAULT_SETTINGS: Settings = {
 
 const SETTINGS_KEY = 'md-notepad-settings'
 
+// Read the persisted settings once; individual initializers pick their field.
+function loadStoredSettings(): Partial<Settings> {
+  return readJSON<Settings>(SETTINGS_KEY, (e) => console.error('Failed to load settings:', e)) ?? {}
+}
+
 export function useSettings(): Settings & {
   setTheme: (theme: 'system' | 'light' | 'dark') => void
   setHighPerformance: (value: boolean) => void
@@ -40,135 +46,58 @@ export function useSettings(): Settings & {
   setAccentColor: (color: AccentColor) => void
   resetToDefaults: () => void
 } {
-  const [theme, setThemeState] = useState<'system' | 'light' | 'dark'>(() => {
-    try {
-      const saved = localStorage.getItem(SETTINGS_KEY)
-      if (saved) {
-        const parsed = JSON.parse(saved) as Settings
-        return parsed.theme || DEFAULT_SETTINGS.theme
-      }
-    } catch (e) {
-      console.error('Failed to load settings:', e)
-    }
-    return DEFAULT_SETTINGS.theme
-  })
+  const [theme, setThemeState] = useState<'system' | 'light' | 'dark'>(
+    () => loadStoredSettings().theme || DEFAULT_SETTINGS.theme
+  )
 
   const [systemPreference, setSystemPreference] = useState<'light' | 'dark'>('dark')
 
-  const [highPerformance, setHighPerformanceState] = useState<boolean>(() => {
-    try {
-      const saved = localStorage.getItem(SETTINGS_KEY)
-      if (saved) {
-        const parsed = JSON.parse(saved) as Settings
-        return parsed.highPerformance ?? DEFAULT_SETTINGS.highPerformance
-      }
-    } catch (e) {
-      console.error('Failed to load settings:', e)
-    }
-    return DEFAULT_SETTINGS.highPerformance
-  })
+  const [highPerformance, setHighPerformanceState] = useState<boolean>(
+    () => loadStoredSettings().highPerformance ?? DEFAULT_SETTINGS.highPerformance
+  )
 
-  const [showBackdrop, setShowBackdropState] = useState<boolean>(() => {
-    try {
-      const saved = localStorage.getItem(SETTINGS_KEY)
-      if (saved) {
-        const parsed = JSON.parse(saved) as Settings
-        return parsed.showBackdrop ?? DEFAULT_SETTINGS.showBackdrop
-      }
-    } catch (e) {
-      console.error('Failed to load settings:', e)
-    }
-    return DEFAULT_SETTINGS.showBackdrop
-  })
+  const [showBackdrop, setShowBackdropState] = useState<boolean>(
+    () => loadStoredSettings().showBackdrop ?? DEFAULT_SETTINGS.showBackdrop
+  )
 
-  const [showShadow, setShowShadowState] = useState<boolean>(() => {
-    try {
-      const saved = localStorage.getItem(SETTINGS_KEY)
-      if (saved) {
-        const parsed = JSON.parse(saved) as Settings
-        return parsed.showShadow ?? DEFAULT_SETTINGS.showShadow
-      }
-    } catch (e) {
-      console.error('Failed to load settings:', e)
-    }
-    return DEFAULT_SETTINGS.showShadow
-  })
+  const [showShadow, setShowShadowState] = useState<boolean>(
+    () => loadStoredSettings().showShadow ?? DEFAULT_SETTINGS.showShadow
+  )
 
-  const [realTimePreview, setRealTimePreviewState] = useState<boolean>(() => {
-    try {
-      const saved = localStorage.getItem(SETTINGS_KEY)
-      if (saved) {
-        const parsed = JSON.parse(saved) as Settings
-        return parsed.realTimePreview ?? DEFAULT_SETTINGS.realTimePreview
-      }
-    } catch (e) {
-      console.error('Failed to load settings:', e)
-    }
-    return DEFAULT_SETTINGS.realTimePreview
-  })
+  const [realTimePreview, setRealTimePreviewState] = useState<boolean>(
+    () => loadStoredSettings().realTimePreview ?? DEFAULT_SETTINGS.realTimePreview
+  )
 
-  const [previewMode, setPreviewModeState] = useState<'split' | 'separate'>(() => {
-    try {
-      const saved = localStorage.getItem(SETTINGS_KEY)
-      if (saved) {
-        const parsed = JSON.parse(saved) as Settings
-        return parsed.previewMode || DEFAULT_SETTINGS.previewMode
-      }
-    } catch (e) {
-      console.error('Failed to load settings:', e)
-    }
-    return DEFAULT_SETTINGS.previewMode
-  })
+  const [previewMode, setPreviewModeState] = useState<'split' | 'separate'>(
+    () => loadStoredSettings().previewMode || DEFAULT_SETTINGS.previewMode
+  )
 
-  const [spellCheck, setSpellCheckState] = useState<boolean>(() => {
-    try {
-      const saved = localStorage.getItem(SETTINGS_KEY)
-      if (saved) {
-        const parsed = JSON.parse(saved) as Settings
-        return parsed.spellCheck ?? DEFAULT_SETTINGS.spellCheck
-      }
-    } catch (e) {
-      console.error('Failed to load settings:', e)
-    }
-    return DEFAULT_SETTINGS.spellCheck
-  })
+  const [spellCheck, setSpellCheckState] = useState<boolean>(
+    () => loadStoredSettings().spellCheck ?? DEFAULT_SETTINGS.spellCheck
+  )
 
-  const [showLineNumbers, setShowLineNumbersState] = useState<boolean>(() => {
-    try {
-      const saved = localStorage.getItem(SETTINGS_KEY)
-      if (saved) {
-        const parsed = JSON.parse(saved) as Settings
-        return parsed.showLineNumbers ?? DEFAULT_SETTINGS.showLineNumbers
-      }
-    } catch (e) {
-      console.error('Failed to load settings:', e)
-    }
-    return DEFAULT_SETTINGS.showLineNumbers
-  })
+  const [showLineNumbers, setShowLineNumbersState] = useState<boolean>(
+    () => loadStoredSettings().showLineNumbers ?? DEFAULT_SETTINGS.showLineNumbers
+  )
 
-  const [accentColor, setAccentColorState] = useState<AccentColor>(() => {
-    try {
-      const saved = localStorage.getItem(SETTINGS_KEY)
-      if (saved) {
-        const parsed = JSON.parse(saved) as Settings
-        return parsed.accentColor || DEFAULT_SETTINGS.accentColor
-      }
-    } catch (e) {
-      console.error('Failed to load settings:', e)
-    }
-    return DEFAULT_SETTINGS.accentColor
-  })
+  const [accentColor, setAccentColorState] = useState<AccentColor>(
+    () => loadStoredSettings().accentColor || DEFAULT_SETTINGS.accentColor
+  )
 
-  // Helper function to save all settings to localStorage
+  // Merge a partial update into the persisted settings object.
   const saveSettings = (updatedSettings: Partial<Settings>) => {
-    try {
-      const current = localStorage.getItem(SETTINGS_KEY)
-      const parsed = current ? JSON.parse(current) : {}
-      const merged = { ...DEFAULT_SETTINGS, ...parsed, ...updatedSettings }
-      localStorage.setItem(SETTINGS_KEY, JSON.stringify(merged))
-    } catch (e) {
-      console.error('Failed to save settings:', e)
-    }
+    const parsed = readJSON<Partial<Settings>>(SETTINGS_KEY) ?? {}
+    const merged = { ...DEFAULT_SETTINGS, ...parsed, ...updatedSettings }
+    writeJSON(SETTINGS_KEY, merged, (e) => console.error('Failed to save settings:', e))
+  }
+
+  // Build a setter that updates local state and persists the change.
+  const createSetter = <K extends keyof Settings>(
+    setState: (value: Settings[K]) => void,
+    key: K
+  ) => (value: Settings[K]) => {
+    setState(value)
+    saveSettings({ [key]: value } as Partial<Settings>)
   }
 
   // Helper function to apply settings to DOM
@@ -229,7 +158,7 @@ export function useSettings(): Settings & {
     setSpellCheckState(DEFAULT_SETTINGS.spellCheck)
     setShowLineNumbersState(DEFAULT_SETTINGS.showLineNumbers)
     setAccentColorState(DEFAULT_SETTINGS.accentColor)
-    localStorage.setItem(SETTINGS_KEY, JSON.stringify(DEFAULT_SETTINGS))
+    writeJSON(SETTINGS_KEY, DEFAULT_SETTINGS)
   }
 
   return {
@@ -242,42 +171,15 @@ export function useSettings(): Settings & {
     spellCheck,
     showLineNumbers,
     accentColor,
-    setTheme: (newTheme: 'system' | 'light' | 'dark') => {
-      setThemeState(newTheme)
-      saveSettings({ theme: newTheme })
-    },
-    setHighPerformance: (value: boolean) => {
-      setHighPerformanceState(value)
-      saveSettings({ highPerformance: value })
-    },
-    setShowBackdrop: (value: boolean) => {
-      setShowBackdropState(value)
-      saveSettings({ showBackdrop: value })
-    },
-    setShowShadow: (value: boolean) => {
-      setShowShadowState(value)
-      saveSettings({ showShadow: value })
-    },
-    setRealTimePreview: (value: boolean) => {
-      setRealTimePreviewState(value)
-      saveSettings({ realTimePreview: value })
-    },
-    setPreviewMode: (mode: 'split' | 'separate') => {
-      setPreviewModeState(mode)
-      saveSettings({ previewMode: mode })
-    },
-    setSpellCheck: (value: boolean) => {
-      setSpellCheckState(value)
-      saveSettings({ spellCheck: value })
-    },
-    setShowLineNumbers: (value: boolean) => {
-      setShowLineNumbersState(value)
-      saveSettings({ showLineNumbers: value })
-    },
-    setAccentColor: (color: AccentColor) => {
-      setAccentColorState(color)
-      saveSettings({ accentColor: color })
-    },
+    setTheme: createSetter(setThemeState, 'theme'),
+    setHighPerformance: createSetter(setHighPerformanceState, 'highPerformance'),
+    setShowBackdrop: createSetter(setShowBackdropState, 'showBackdrop'),
+    setShowShadow: createSetter(setShowShadowState, 'showShadow'),
+    setRealTimePreview: createSetter(setRealTimePreviewState, 'realTimePreview'),
+    setPreviewMode: createSetter(setPreviewModeState, 'previewMode'),
+    setSpellCheck: createSetter(setSpellCheckState, 'spellCheck'),
+    setShowLineNumbers: createSetter(setShowLineNumbersState, 'showLineNumbers'),
+    setAccentColor: createSetter(setAccentColorState, 'accentColor'),
     resetToDefaults
   }
 }

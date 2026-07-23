@@ -2,6 +2,7 @@ import React from 'react'
 import ReactMarkdown from 'react-markdown'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism'
+import { getPaneStyle } from '../utils'
 
 interface PreviewProps {
   value: string
@@ -18,17 +19,7 @@ export function Preview({
     <div
       className="preview"
       aria-hidden
-      style={
-        isColumnLayout
-          ? {
-              height: `${100 - editorSize}%`,
-              flex: `0 0 ${100 - editorSize}%`,
-            }
-          : {
-              width: `${100 - editorSize}%`,
-              flex: `0 0 ${100 - editorSize}%`,
-            }
-      }
+      style={getPaneStyle(100 - editorSize, isColumnLayout)}
     >
       <ReactMarkdown
         components={{

@@ -5,6 +5,8 @@ interface TooltipProps {
   keybind?: string
 }
 
+const HIDDEN_STYLE = { visibility: 'hidden', opacity: 0 } as const
+
 export function Tooltip({ text, keybind }: TooltipProps): React.JSX.Element {
   const tooltipRef = useRef<HTMLSpanElement>(null)
   const [style, setStyle] = useState<React.CSSProperties>({})
@@ -68,56 +70,32 @@ export function Tooltip({ text, keybind }: TooltipProps): React.JSX.Element {
       calculatePosition()
     }
 
-    const handleMouseLeave = () => {
+    const hideTooltip = () => {
       isTooltipVisible = false
-      setStyle(prev => ({
-        ...prev,
-        visibility: 'hidden',
-        opacity: 0,
-      }))
+      setStyle(prev => ({ ...prev, ...HIDDEN_STYLE }))
     }
+
+    const handleMouseLeave = hideTooltip
 
     const handleFocus = () => {
       isTooltipVisible = true
       calculatePosition()
     }
 
-    const handleBlur = () => {
-      isTooltipVisible = false
-      setStyle(prev => ({
-        ...prev,
-        visibility: 'hidden',
-        opacity: 0,
-      }))
-    }
+    const handleBlur = hideTooltip
 
-    const handleResize = () => {
+    const repositionIfVisible = () => {
       if (isTooltipVisible) {
         calculatePosition()
       }
     }
 
-    const handleScroll = () => {
-      if (isTooltipVisible) {
-        calculatePosition()
-      }
-    }
+    const handleResize = repositionIfVisible
+    const handleScroll = repositionIfVisible
+    const handleMouseMove = repositionIfVisible
 
-    const handleMouseMove = () => {
-      if (isTooltipVisible) {
-        calculatePosition()
-      }
-    }
-
-    const handleClick = () => {
-      // Hide tooltip immediately on click
-      isTooltipVisible = false
-      setStyle(prev => ({
-        ...prev,
-        visibility: 'hidden',
-        opacity: 0,
-      }))
-    }
+    // Hide tooltip immediately on click
+    const handleClick = hideTooltip
 
     button.addEventListener('mouseenter', handleMouseEnter)
     button.addEventListener('mouseleave', handleMouseLeave)

@@ -1,16 +1,15 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { Toolbar, Editor, Preview, InfoModal, StatusBar } from './components'
 import { useSettings, useResponsiveLayout, useResizer, useTextEditor } from './hooks'
+import { readStorage, writeStorage } from './utils'
 import './styles/index.css'
+
+const CONTENT_KEY = 'md-notepad-content'
+const DEFAULT_CONTENT = '# Welcome to MD-Notepad\n\nStart typing *your* **markdown** ***here***...\n\n`console.log("Hello World")`'
 
 // Load editor content from localStorage or return default
 function getInitialEditorContent(): string {
-  try {
-    const saved = localStorage.getItem('md-notepad-content')
-    return saved || '# Welcome to MD-Notepad\n\nStart typing *your* **markdown** ***here***...\n\n`console.log("Hello World")`'
-  } catch {
-    return '# Welcome to MD-Notepad\n\nStart typing *your* **markdown** ***here***...\n\n`console.log("Hello World")`'
-  }
+  return readStorage(CONTENT_KEY) || DEFAULT_CONTENT
 }
 
 function App(): React.JSX.Element {
@@ -33,11 +32,7 @@ function App(): React.JSX.Element {
 
   // Save editor content to localStorage whenever it changes
   useEffect(() => {
-    try {
-      localStorage.setItem('md-notepad-content', value)
-    } catch {
-      // Silently fail if localStorage is unavailable (quota exceeded, etc.)
-    }
+    writeStorage(CONTENT_KEY, value)
   }, [value])
 
   useEffect(() => {

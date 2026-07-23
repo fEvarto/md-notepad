@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { MOBILE_MEDIA_QUERY } from '../utils'
 
 export function useResponsiveLayout(): {
   isColumnLayout: boolean
@@ -6,7 +7,7 @@ export function useResponsiveLayout(): {
   const [isColumnLayout, setIsColumnLayout] = useState<boolean>(false)
 
   useEffect(() => {
-    const mediaQuery = window.matchMedia('(max-width: 768px)')
+    const mediaQuery = window.matchMedia(MOBILE_MEDIA_QUERY)
     const handleChange = (e: MediaQueryListEvent) => {
       setIsColumnLayout(e.matches)
     }

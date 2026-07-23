@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react'
+import { getPaneStyle } from '../utils'
 
 interface EditorProps {
   value: string
@@ -76,17 +77,7 @@ export function Editor({
         autoCapitalize="off"
         autoComplete="off"
         autoCorrect={spellCheck ? 'on' : 'off'}
-        style={
-          isColumnLayout
-            ? {
-                height: `${editorSize}%`,
-                flex: `0 0 ${editorSize}%`,
-              }
-            : {
-                width: `${editorSize}%`,
-                flex: `0 0 ${editorSize}%`,
-              }
-        }
+        style={getPaneStyle(editorSize, isColumnLayout)}
         value={value}
         onChange={(e) => {
           onChange(e.target.value)

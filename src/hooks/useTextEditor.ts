@@ -1,5 +1,13 @@
 import { useCallback } from 'react'
 
+// Restore focus and selection after a value change has been flushed to the DOM.
+function restoreSelection(ta: HTMLTextAreaElement, start: number, end: number): void {
+  requestAnimationFrame(() => {
+    ta.focus()
+    ta.setSelectionRange(start, end)
+  })
+}
+
 export function useTextEditor(
   value: string,
   setValue: (value: string) => void,
@@ -19,13 +27,8 @@ export function useTextEditor(
     const close = after ?? before
     const newText = value.slice(0, start) + before + selected + close + value.slice(end)
     setValue(newText)
-    requestAnimationFrame(() => {
-      if (!ta) return
-      const newStart = start + before.length
-      const newEnd = newStart + selected.length
-      ta.focus()
-      ta.setSelectionRange(newStart, newEnd)
-    })
+    const newStart = start + before.length
+    restoreSelection(ta, newStart, newStart + selected.length)
   }, [value, setValue, textareaRef])
 
   const toggleWrap = useCallback((before: string, after?: string) => {
@@ -47,13 +50,8 @@ export function useTextEditor(
       const newText = value.slice(0, start - before.length) + selected + value.slice(end + close.length)
       setValue(newText)
 
-      requestAnimationFrame(() => {
-        if (!ta) return
-        const newStart = start - before.length
-        const newEnd = newStart + selected.length
-        ta.focus()
-        ta.setSelectionRange(newStart, newEnd)
-      })
+      const newStart = start - before.length
+      restoreSelection(ta, newStart, newStart + selected.length)
 
       return true
     }
@@ -73,11 +71,7 @@ export function useTextEditor(
     const joined = lines.join('\n')
     const newText = before + joined + value.slice(end)
     setValue(newText)
-    requestAnimationFrame(() => {
-      if (!ta) return
-      ta.focus()
-      ta.setSelectionRange(start + prefix.length, start + prefix.length + joined.length - prefix.length)
-    })
+    restoreSelection(ta, start + prefix.length, start + joined.length)
   }, [value, setValue, textareaRef])
 
   const exportMarkdown = useCallback((filename = 'note.md') => {
