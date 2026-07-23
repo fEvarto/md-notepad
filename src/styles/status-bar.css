@@ -70,6 +70,26 @@
   font-size: 0.9rem;
 }
 
+.status-save-error {
+  color: #ff6b6b;
+  gap: 0.35rem;
+  font-weight: 600;
+}
+
+.status-save-error .status-value {
+  color: #ff6b6b;
+  font-family: inherit;
+}
+
+.status-save-error .status-icon {
+  flex: 0 0 auto;
+}
+
+[data-theme="light"] .status-save-error,
+[data-theme="light"] .status-save-error .status-value {
+  color: #d64545;
+}
+
 .status-button {
   display: flex;
   align-items: center;

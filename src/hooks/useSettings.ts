@@ -229,7 +229,11 @@ export function useSettings(): Settings & {
     setSpellCheckState(DEFAULT_SETTINGS.spellCheck)
     setShowLineNumbersState(DEFAULT_SETTINGS.showLineNumbers)
     setAccentColorState(DEFAULT_SETTINGS.accentColor)
-    localStorage.setItem(SETTINGS_KEY, JSON.stringify(DEFAULT_SETTINGS))
+    try {
+      localStorage.setItem(SETTINGS_KEY, JSON.stringify(DEFAULT_SETTINGS))
+    } catch (e) {
+      console.error('Failed to reset settings:', e)
+    }
   }
 
   return {

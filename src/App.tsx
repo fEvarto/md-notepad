@@ -8,7 +8,8 @@ function getInitialEditorContent(): string {
   try {
     const saved = localStorage.getItem('md-notepad-content')
     return saved || '# Welcome to MD-Notepad\n\nStart typing *your* **markdown** ***here***...\n\n`console.log("Hello World")`'
-  } catch {
+  } catch (e) {
+    console.error('Failed to load note from localStorage:', e)
     return '# Welcome to MD-Notepad\n\nStart typing *your* **markdown** ***here***...\n\n`console.log("Hello World")`'
   }
 }
@@ -23,6 +24,7 @@ function App(): React.JSX.Element {
   const [shownPane, setShownPane] = useState<'editor' | 'preview'>('editor')
   const [cursorPosition, setCursorPosition] = useState<number>(0)
   const [wrapToggleFeedback, setWrapToggleFeedback] = useState<'bold' | 'italic' | 'code' | null>(null)
+  const [saveError, setSaveError] = useState<boolean>(false)
   const textareaRef = useRef<HTMLTextAreaElement | null>(null)
   const containerRef = useRef<HTMLDivElement | null>(null)
 
@@ -35,8 +37,12 @@ function App(): React.JSX.Element {
   useEffect(() => {
     try {
       localStorage.setItem('md-notepad-content', value)
-    } catch {
-      // Silently fail if localStorage is unavailable (quota exceeded, etc.)
+      setSaveError(false)
+    } catch (e) {
+      // localStorage may be unavailable (quota exceeded, private mode, etc.).
+      // Surface the failure instead of silently dropping the user's work.
+      console.error('Failed to save note to localStorage:', e)
+      setSaveError(true)
     }
   }, [value])
 
@@ -230,6 +236,7 @@ function App(): React.JSX.Element {
       <StatusBar
         text={value}
         filename={filename}
+        saveError={saveError}
         spellCheck={spellCheck}
         cursorPosition={cursorPosition}
         onSpellCheckToggle={() => setSpellCheck(!spellCheck)}

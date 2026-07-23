@@ -4,6 +4,7 @@ import { Tooltip } from './Tooltip'
 interface StatusBarProps {
   text: string
   filename: string
+  saveError?: boolean
   spellCheck: boolean
   cursorPosition: number
   realTimePreview: boolean
@@ -67,6 +68,7 @@ function getFileStats(text: string, cursorPosition: number): FileStats {
 export function StatusBar({
   text,
   filename,
+  saveError = false,
   spellCheck,
   cursorPosition,
   realTimePreview,
@@ -114,6 +116,21 @@ export function StatusBar({
       </div>
 
       <div className="status-right-group">
+        {saveError && (
+          <div
+            className="status-item status-save-error"
+            role="status"
+            title="Your note could not be saved to this browser. Export it to avoid losing changes."
+          >
+            <svg className="status-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+              <line x1="12" y1="9" x2="12" y2="13"></line>
+              <line x1="12" y1="17" x2="12.01" y2="17"></line>
+            </svg>
+            <span className="status-value">Not saved</span>
+          </div>
+        )}
+
         {!realTimePreview && (
           <button className="status-button secondary" onClick={onManualPreviewUpdate} title="Update preview manually" aria-label="Update preview manually">
             <svg className="status-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

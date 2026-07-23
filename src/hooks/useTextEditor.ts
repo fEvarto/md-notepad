@@ -8,7 +8,7 @@ export function useTextEditor(
   applyWrap: (before: string, after?: string) => void
   toggleWrap: (before: string, after?: string) => boolean
   applyLinePrefix: (prefix: string) => void
-  exportMarkdown: (filename?: string) => void
+  exportMarkdown: (filename?: string) => boolean
 } {
   const applyWrap = useCallback((before: string, after?: string) => {
     const ta = textareaRef.current
@@ -81,15 +81,23 @@ export function useTextEditor(
   }, [value, setValue, textareaRef])
 
   const exportMarkdown = useCallback((filename = 'note.md') => {
-    const blob = new Blob([value], { type: 'text/markdown;charset=utf-8' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = filename
-    document.body.appendChild(a)
-    a.click()
-    a.remove()
-    URL.revokeObjectURL(url)
+    let url: string | null = null
+    try {
+      const blob = new Blob([value], { type: 'text/markdown;charset=utf-8' })
+      url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = filename || 'note.md'
+      document.body.appendChild(a)
+      a.click()
+      a.remove()
+      return true
+    } catch (e) {
+      console.error('Failed to export markdown file:', e)
+      return false
+    } finally {
+      if (url) URL.revokeObjectURL(url)
+    }
   }, [value])
 
   return {
