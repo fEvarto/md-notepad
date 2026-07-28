@@ -89,17 +89,19 @@
   background: rgba(255, 255, 255, 0.1);
   border-color: rgba(255, 255, 255, 0.2);
   color: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 6px 25px rgba(var(--accent-primary),0.2)
 }
 
 .status-button.active {
-  background: rgba(100, 200, 255, 0.2);
-  border-color: rgba(100, 200, 255, 0.4);
-  color: #64c8ff;
+  background: rgba(var(--accent-primary), 0.2);
+  border-color: rgba(var(--accent-primary), 0.4);
+  color: var(--accent-primary);
 }
 
 .status-button.active:hover {
-  background: rgba(100, 200, 255, 0.3);
-  border-color: rgba(100, 200, 255, 0.6);
+  background: rgba(var(--accent-primary), 0.3);
+  border-color: rgba(var(--accent-primary), 0.6);
+  box-shadow: 0 6px 25px rgba(var(--accent-primary), 0.2)
 }
 
 .status-icon {
@@ -187,17 +189,6 @@
   background: rgba(0, 0, 0, 0.08);
   border-color: rgba(0, 0, 0, 0.2);
   color: rgba(0, 0, 0, 0.7);
-}
-
-[data-theme="light"] .status-button.active {
-  background: rgba(100, 200, 255, 0.15);
-  border-color: rgba(100, 200, 255, 0.3);
-  color: #3a9fdb;
-}
-
-[data-theme="light"] .status-button.active:hover {
-  background: rgba(100, 200, 255, 0.25);
-  border-color: rgba(100, 200, 255, 0.5);
 }
 
 /* Responsive design for mobile */

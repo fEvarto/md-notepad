@@ -1,6 +1,12 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { Toolbar, Editor, Preview, InfoModal, StatusBar } from './components'
 import { useSettings, useResponsiveLayout, useResizer, useTextEditor } from './hooks'
+import {
+  getVisibleToolbarButtons,
+  limitToolbarButtons,
+  PHONE_MAX_VISIBLE_BUTTONS,
+  TABLET_MAX_VISIBLE_BUTTONS,
+} from './utils/toolbarButtons'
 import './styles/index.css'
 
 // Load editor content from localStorage or return default
@@ -26,10 +32,54 @@ function App(): React.JSX.Element {
   const textareaRef = useRef<HTMLTextAreaElement | null>(null)
   const containerRef = useRef<HTMLDivElement | null>(null)
 
-  const { isColumnLayout } = useResponsiveLayout()
-  const { theme, highPerformance, showBackdrop, showShadow, realTimePreview, previewMode, spellCheck, showLineNumbers, accentColor, setTheme, setHighPerformance, setShowBackdrop, setShowShadow, setRealTimePreview, setPreviewMode, setSpellCheck, setShowLineNumbers, setAccentColor, resetToDefaults } = useSettings()
+  const { isColumnLayout, isPhoneLayout, isTabletLayout } = useResponsiveLayout()
+  const { theme, highPerformance, showBackdrop, showShadow, realTimePreview, previewMode, spellCheck, showLineNumbers, accentColor, customAccentColor, toolbarButtonOrder, visibleToolbarButtons, setTheme, setHighPerformance, setShowBackdrop, setShowShadow, setRealTimePreview, setPreviewMode, setSpellCheck, setShowLineNumbers, setAccentColor, setCustomAccentColor, setToolbarButtonOrder, setVisibleToolbarButtons, resetToDefaults, exportSettingsToFile, importSettingsFromFile } = useSettings()
   const { handleSeparatorMouseDown, handleSeparatorTouchStart } = useResizer(editorSize, setEditorSize, containerRef)
-  const { applyWrap, toggleWrap, applyLinePrefix, exportMarkdown } = useTextEditor(value, setValue, textareaRef)
+  const { applyWrap, toggleWrap, applyLinePrefix, applyLink, applyImage, applyCodeBlock, applyTable, exportMarkdown } = useTextEditor(value, setValue, textareaRef)
+  const maxStyleButtons = useMemo(() => {
+    if (isPhoneLayout) return PHONE_MAX_VISIBLE_BUTTONS
+    if (isTabletLayout) return TABLET_MAX_VISIBLE_BUTTONS
+    return Infinity
+  }, [isPhoneLayout, isTabletLayout])
+
+  const totalEnabledStyleButtons = useMemo(
+    () => getVisibleToolbarButtons(toolbarButtonOrder, visibleToolbarButtons).length,
+    [toolbarButtonOrder, visibleToolbarButtons]
+  )
+
+  const finalVisibleToolbarButtons = useMemo(
+    () =>
+      limitToolbarButtons(
+        getVisibleToolbarButtons(toolbarButtonOrder, visibleToolbarButtons),
+        maxStyleButtons
+      ),
+    [toolbarButtonOrder, visibleToolbarButtons, maxStyleButtons]
+  )
+  const toolbarActions = useMemo(
+    () => ({
+      onBold: () => {
+        const didRemove = toggleWrap('**')
+        if (didRemove) setWrapToggleFeedback('bold')
+      },
+      onItalic: () => {
+        const didRemove = toggleWrap('*')
+        if (didRemove) setWrapToggleFeedback('italic')
+      },
+      onCode: () => {
+        const didRemove = toggleWrap('`')
+        if (didRemove) setWrapToggleFeedback('code')
+      },
+      onH1: () => applyLinePrefix('# '),
+      onH2: () => applyLinePrefix('## '),
+      onList: () => applyLinePrefix('- '),
+      onLink: applyLink,
+      onImage: applyImage,
+      onBlockquote: () => applyLinePrefix('> '),
+      onCodeBlock: applyCodeBlock,
+      onTable: applyTable,
+    }),
+    [toggleWrap, applyLinePrefix, applyLink, applyImage, applyCodeBlock, applyTable]
+  )
 
   // Save editor content to localStorage whenever it changes
   useEffect(() => {
@@ -101,6 +151,36 @@ function App(): React.JSX.Element {
           applyLinePrefix('- ')
           return
         }
+
+        if (e.altKey && key === 'u') {
+          e.preventDefault()
+          applyLink()
+          return
+        }
+
+        if (e.altKey && key === 'g') {
+          e.preventDefault()
+          applyImage()
+          return
+        }
+
+        if (e.altKey && key === 'q') {
+          e.preventDefault()
+          applyLinePrefix('> ')
+          return
+        }
+
+        if (e.altKey && key === 'c') {
+          e.preventDefault()
+          applyCodeBlock()
+          return
+        }
+
+        if (e.altKey && key === 't') {
+          e.preventDefault()
+          applyTable()
+          return
+        }
       }
 
       if (e.altKey) {
@@ -132,7 +212,7 @@ function App(): React.JSX.Element {
 
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
-  }, [applyWrap, applyLinePrefix, exportMarkdown, filename, spellCheck, setSpellCheck, showLineNumbers, setShowLineNumbers, previewMode, setShownPane, realTimePreview, setRealTimePreview])
+  }, [applyWrap, applyLinePrefix, applyLink, applyImage, applyCodeBlock, applyTable, exportMarkdown, filename, spellCheck, setSpellCheck, showLineNumbers, setShowLineNumbers, previewMode, setShownPane, realTimePreview, setRealTimePreview])
 
   return (
     <div className="editor-app">
@@ -140,21 +220,9 @@ function App(): React.JSX.Element {
         filename={filename}
         onFilenameChange={setFilename}
         onExport={exportMarkdown}
-        onBold={() => {
-          const didRemove = toggleWrap('**')
-          if (didRemove) setWrapToggleFeedback('bold')
-        }}
-        onItalic={() => {
-          const didRemove = toggleWrap('*')
-          if (didRemove) setWrapToggleFeedback('italic')
-        }}
-        onCode={() => {
-          const didRemove = toggleWrap('`')
-          if (didRemove) setWrapToggleFeedback('code')
-        }}
-        onH1={() => applyLinePrefix('# ')}
-        onH2={() => applyLinePrefix('## ')}
-        onList={() => applyLinePrefix('- ')}
+        visibleButtons={finalVisibleToolbarButtons}
+        totalStyleButtonsCount={totalEnabledStyleButtons}
+        actions={toolbarActions}
         onInfoClick={() => setShowInfo(true)}
         wrapToggleFeedback={wrapToggleFeedback}
       />
@@ -223,8 +291,16 @@ function App(): React.JSX.Element {
         showLineNumbers={showLineNumbers}
         onShowLineNumbersChange={setShowLineNumbers}
         accentColor={accentColor}
+        customAccentColor={customAccentColor}
         onAccentColorChange={setAccentColor}
+        onCustomAccentColorChange={setCustomAccentColor}
+        toolbarButtonOrder={toolbarButtonOrder}
+        visibleToolbarButtons={visibleToolbarButtons}
+        onToolbarButtonOrderChange={setToolbarButtonOrder}
+        onVisibleToolbarButtonsChange={setVisibleToolbarButtons}
         onResetToDefaults={resetToDefaults}
+        onExportSettings={exportSettingsToFile}
+        onImportSettings={importSettingsFromFile}
       />
 
       <StatusBar

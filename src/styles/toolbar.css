@@ -193,3 +193,22 @@
   color: #fff;
 }
 
+/* Overflow indicator for hidden style buttons */
+.toolbar .toolbar-overflow-indicator {
+  font-size: 0.6rem;
+  font-weight: 600;
+  padding: 0.1rem 0.1rem;
+  opacity: 0.75;
+  letter-spacing: 0.02em;
+  border-style: dashed;
+}
+
+.toolbar .toolbar-overflow-indicator:hover {
+  opacity: 1;
+}
+
+.toolbar-overflow-icon {
+  font-style: normal;
+  white-space: nowrap;
+}
+

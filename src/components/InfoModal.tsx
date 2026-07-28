@@ -2,7 +2,9 @@ import React, { useEffect, useRef, useState } from 'react'
 import { CollapsibleSection } from './CollapsibleSection'
 import { getRandomTip, getRandomTipExcluding, type Tip } from '../data/tips'
 import { patchNotes } from '../data/patchNotes'
-import { type AccentColor } from '../hooks/useSettings'
+import { type AccentColor, PRESET_ACCENT_COLORS, darkenHexColor } from '../utils/accentColor'
+import type { ToolbarStyleButtonId } from '../utils/toolbarButtons'
+import { ToolbarLoadoutEditor } from './ToolbarLoadoutEditor'
 import { InfoInIcon, LightbulbIcon, SettingsIcon, SparklesIcon } from './Icons'
 
 interface InfoModalProps {
@@ -27,9 +29,17 @@ interface InfoModalProps {
   showLineNumbers: boolean
   onShowLineNumbersChange: (value: boolean) => void
   accentColor: AccentColor
+  customAccentColor: string
   onAccentColorChange: (color: AccentColor) => void
+  onCustomAccentColorChange: (hex: string) => void
+    toolbarButtonOrder: ToolbarStyleButtonId[]
+  visibleToolbarButtons: ToolbarStyleButtonId[]
+  onToolbarButtonOrderChange: (order: ToolbarStyleButtonId[]) => void
+  onVisibleToolbarButtonsChange: (buttons: ToolbarStyleButtonId[]) => void
   onResetToDefaults: () => void
-}
+    onExportSettings: () => void
+    onImportSettings: () => Promise<void>
+  }
 
 export function InfoModal({
   isOpen,
@@ -53,9 +63,17 @@ export function InfoModal({
   showLineNumbers,
   onShowLineNumbersChange,
   accentColor,
+  customAccentColor,
   onAccentColorChange,
+  onCustomAccentColorChange,
+  toolbarButtonOrder,
+  visibleToolbarButtons,
+  onToolbarButtonOrderChange,
+  onVisibleToolbarButtonsChange,
   onResetToDefaults,
-}: InfoModalProps): React.JSX.Element | null {
+    onExportSettings,
+    onImportSettings,
+  }: InfoModalProps): React.JSX.Element | null {
   const modalRef = useRef<HTMLDivElement | null>(null)
   const prevFocusedRef = useRef<HTMLElement | null>(null)
   const [currentTip, setCurrentTip] = useState<Tip>(getRandomTip())
@@ -247,22 +265,61 @@ export function InfoModal({
                 <label className="setting-item" style={{ marginTop: '1rem' }}>
                   <span className="checkbox-label" style={{ display: 'block', marginBottom: '0.5rem' }}>Accent Color</span>
                   <div className="accent-color-selector">
-                    {(['red', 'blue', 'green', 'purple', 'orange'] as const).map((color) => (
+                    {PRESET_ACCENT_COLORS.map((color) => (
                       <button
                         key={color}
+                        type="button"
                         className={`accent-color-option accent-${color} ${accentColor === color ? 'active' : ''}`}
                         onClick={() => onAccentColorChange(color)}
                         title={color.charAt(0).toUpperCase() + color.slice(1)}
                         aria-label={color}
                       />
                     ))}
+                    <button
+                      type="button"
+                      className={`accent-color-option accent-custom ${accentColor === 'custom' ? 'active' : ''}`}
+                      style={{
+                        background: `linear-gradient(135deg, ${customAccentColor}, ${darkenHexColor(customAccentColor)})`
+                      }}
+                      onClick={() => onAccentColorChange('custom')}
+                      title="Custom"
+                      aria-label="Custom accent color"
+                    />
+                  </div>
+                  <div className="accent-color-custom-row">
+                    <input
+                      type="color"
+                      className="accent-color-custom-input"
+                      value={customAccentColor}
+                      onChange={(e) => onCustomAccentColorChange(e.target.value)}
+                      aria-label="Pick custom accent color"
+                    />
+                    <span className="accent-color-custom-label">Custom color</span>
                   </div>
                 </label>
-                <small>Choose an accent color for app highlights and interactive elements</small>
+                <small>Choose a preset or pick a custom accent for highlights and interactive elements</small>
               </div>
 
-              <h3>Performance</h3>
+              <h3>Visual & Performance</h3>
               <div className="settings-group">
+                <label className="setting-item">
+                  <input
+                    type="checkbox"
+                    checked={showBackdrop}
+                    onChange={(e) => onShowBackdropChange(e.target.checked)}
+                    className="checkbox-input"
+                  />
+                  <span className="checkbox-label">Show Backdrop Blur</span>
+                </label>
+                <label className="setting-item">
+                  <input
+                    type="checkbox"
+                    checked={showShadow}
+                    onChange={(e) => onShowShadowChange(e.target.checked)}
+                    className="checkbox-input"
+                  />
+                  <span className="checkbox-label">Show Shadow Effects</span>
+                </label>
                 <label className="setting-item">
                   <input
                     type="checkbox"
@@ -274,12 +331,27 @@ export function InfoModal({
                 </label>
                 <small>Reduces animations and visual effects for better performance on slower devices</small>
               </div>
+                
+                <div className="settings-section-divider"></div>
 
+              <div className="settings-category-header">
+                <h3 className="settings-category-title">Toolbar</h3>
+                <p className="settings-category-desc">Choose which markdown style buttons appear and in what order</p>
+              </div>
+              <div className="settings-group">
+                              <ToolbarLoadoutEditor
+                                                buttonOrder={toolbarButtonOrder}
+                                                visibleButtons={visibleToolbarButtons}
+                                                onButtonOrderChange={onToolbarButtonOrderChange}
+                                                onVisibleButtonsChange={onVisibleToolbarButtonsChange}
+                                              />
+                            </div>
+                            
               <div className="settings-section-divider"></div>
 
               <div className="settings-category-header">
-                <h3 className="settings-category-title">Preview</h3>
-                <p className="settings-category-desc">Control how markdown is previewed</p>
+                <h3 className="settings-category-title">Editor & Preview</h3>
+                <p className="settings-category-desc">Control the way you edit markdown</p>
               </div>
 
               <h3>Preview Mode</h3>
@@ -294,6 +366,24 @@ export function InfoModal({
                   <span className="checkbox-label">Real-Time Preview</span>
                 </label>
                 <small>When disabled, use the "Update Preview" button to refresh the rendered preview manually.</small>
+                <label className="setting-item">
+                  <input
+                    type="checkbox"
+                    checked={spellCheck}
+                    onChange={(e) => onSpellCheckChange(e.target.checked)}
+                    className="checkbox-input"
+                  />
+                  <span className="checkbox-label">Enable Spell Checking</span>
+                </label>
+                <label className="setting-item">
+                  <input
+                    type="checkbox"
+                    checked={showLineNumbers}
+                    onChange={(e) => onShowLineNumbersChange(e.target.checked)}
+                    className="checkbox-input"
+                  />
+                  <span className="checkbox-label">Show Line Numbers</span>
+                </label>
               </div>
 
               <h3>Preview Layout</h3>
@@ -321,75 +411,11 @@ export function InfoModal({
                 <small>Split mode shows editor and preview side-by-side. Separate mode swaps the main area between editor and preview using toolbar toggle button.</small>
               </div>
 
-              <h3>Visual Styles</h3>
-              <div className="settings-group">
-                <label className="setting-item">
-                  <input
-                    type="checkbox"
-                    checked={showBackdrop}
-                    onChange={(e) => onShowBackdropChange(e.target.checked)}
-                    className="checkbox-input"
-                  />
-                  <span className="checkbox-label">Show Backdrop Blur</span>
-                </label>
-                <label className="setting-item">
-                  <input
-                    type="checkbox"
-                    checked={showShadow}
-                    onChange={(e) => onShowShadowChange(e.target.checked)}
-                    className="checkbox-input"
-                  />
-                  <span className="checkbox-label">Show Shadow Effects</span>
-                </label>
-                <label className="setting-item">
-                  <input
-                    type="checkbox"
-                    checked={spellCheck}
-                    onChange={(e) => onSpellCheckChange(e.target.checked)}
-                    className="checkbox-input"
-                  />
-                  <span className="checkbox-label">Enable Spell Checking</span>
-                </label>
-                <label className="setting-item">
-                  <input
-                    type="checkbox"
-                    checked={showLineNumbers}
-                    onChange={(e) => onShowLineNumbersChange(e.target.checked)}
-                    className="checkbox-input"
-                  />
-                  <span className="checkbox-label">Show Line Numbers</span>
-                </label>
-              </div>
+              <h3>Editor Keyboard Shortcuts</h3>
 
-              <div className="settings-section-divider"></div>
-
-              <div className="settings-category-header">
-                <h3 className="settings-category-title">Editor</h3>
-                <p className="settings-category-desc">Customize editor behavior and display</p>
-              </div>
-
-              <h3>Keyboard Shortcuts</h3>
               <ul className="shortcuts-list">
                 <li>
                   <kbd>Ctrl</kbd>/<kbd>Cmd</kbd>+<kbd>S</kbd> — Export as .md file
-                </li>
-                <li>
-                  <kbd>Ctrl</kbd>/<kbd>Cmd</kbd>+<kbd>B</kbd> — Bold selected text
-                </li>
-                <li>
-                  <kbd>Ctrl</kbd>/<kbd>Cmd</kbd>+<kbd>I</kbd> — Italicize selected text
-                </li>
-                <li>
-                  <kbd>Ctrl</kbd>/<kbd>Cmd</kbd>+<kbd>K</kbd> — Wrap selection in inline code
-                </li>
-                <li>
-                  <kbd>Ctrl</kbd>/<kbd>Cmd</kbd>+<kbd>Alt</kbd>+<kbd>1</kbd> — Apply H1 heading
-                </li>
-                <li>
-                  <kbd>Ctrl</kbd>/<kbd>Cmd</kbd>+<kbd>Alt</kbd>+<kbd>2</kbd> — Apply H2 heading
-                </li>
-                <li>
-                  <kbd>Ctrl</kbd>/<kbd>Cmd</kbd>+<kbd>Alt</kbd>+<kbd>L</kbd> — Create a list item
                 </li>
                 <li>
                   <kbd>Ctrl</kbd>/<kbd>Cmd</kbd>+<kbd>Alt</kbd>+<kbd>S</kbd> — Toggle spell checking
@@ -411,18 +437,46 @@ export function InfoModal({
                 </li>
               </ul>
 
-              <h3>Reset Application</h3>
-              <p className="reset-description">Reset all settings to their default values.</p>
-              <button
-                className="reset-button"
-                onClick={() => {
-                  if (confirm('Are you sure? This will reset all settings to default values.')) {
-                    onResetToDefaults()
-                  }
-                }}
-              >
-                Reset to Defaults
-              </button>
+                            <div className="settings-section-divider"></div>
+
+              <div className="settings-category-header">
+                <h3 className="settings-category-title">Settings manipulation</h3>
+                <p className="settings-category-desc">Transfer settings to another device or reset current ones to defaults</p>
+              </div>
+
+              <h3>Settings Transfer</h3>
+                            <p className="reset-description">Export your settings to a file or import settings from a previously exported file.</p>
+                            <div className="settings-manipulation-buttons">
+                              <button
+                                className="export-button"
+                                onClick={onExportSettings}
+                              >
+                                ⬇ Export Settings
+                              </button>
+                              <button
+                                className="import-button"
+                                onClick={() => {
+                                  onImportSettings().catch(() => {
+                                    alert('Failed to import settings. Make sure the file is a valid settings JSON file.')
+                                  })
+                                }}
+                              >
+                                ⬆ Import Settings
+                              </button>
+                            </div>
+
+                            <h3>Reset Application</h3>
+                            <p className="reset-description">Reset all settings to their default values.</p>
+                            <button
+                              className="reset-button"
+                              onClick={() => {
+                                if (confirm('Are you sure? This will reset all settings to default values.')) {
+                                  onResetToDefaults()
+                                }
+                              }}
+                            >
+                              Reset to Defaults
+                            </button>
             </div>
           )}
 

@@ -125,6 +125,24 @@
   color: rgba(255, 255, 255, 0.8);
 }
 
+.preview table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0.75rem 0;
+  font-size: 0.95em;
+}
+
+.preview th,
+.preview td {
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 0.45rem 0.65rem;
+  text-align: left;
+}
+
+.preview th {
+  background: rgba(255, 255, 255, 0.06);
+}
+
 .preview a {
   color: #a8b5ff;
   text-decoration: none;

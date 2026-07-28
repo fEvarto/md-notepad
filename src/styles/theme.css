@@ -29,6 +29,8 @@
   --accent-dark: #f76707;
 }
 
+/* Custom accent: --accent-primary / --accent-dark applied inline in useSettings */
+
 /* Light theme styles */
 :root[data-theme="dark"] {
   color-scheme: dark;
@@ -93,18 +95,28 @@
   border-color: rgba(0, 0, 0, 0.1);
 }
 
-:root[data-theme="light"] .modal a {
-  color: #0066cc;
-  border-bottom-color: rgba(0, 102, 204, 0.3);
+:root[data-theme="light"] .tip-content {
+  color: #1a1a1a;
 }
 
-:root[data-theme="light"] .modal a:hover {
-  color: #0052a3;
-  border-bottom-color: rgba(0, 82, 163, 0.5);
+[data-theme="light"] .tip-button {
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.12), rgba(0, 0, 0, 0.1));
+  color: #1a1a1a;
+  border-color: rgba(0, 0, 0, 0.25);
 }
 
 :root[data-theme="light"] .modal h3 {
   color: #1a1a1a;
+}
+
+:root[data-theme="light"] .modal-actions button {
+  background: rgba(0, 0, 0, 0.05);
+  color: #1a1a1a;
+  border-color: rgba(0, 0, 0, 0.12);
+}
+
+:root[data-theme="light"] .modal-actions button:hover {
+  background: rgba(0, 0, 0, 0.1);
 }
 
 :root[data-theme="light"] .modal-tabs {
@@ -121,8 +133,8 @@
 }
 
 :root[data-theme="light"] .tab-button.active {
-  color: #0066cc;
-  border-bottom-color: #0066cc;
+  color: var(--accent-primary);
+  border-bottom-color: var(--accent-primary);
 }
 
 :root[data-theme="light"] .preview code {
@@ -138,18 +150,18 @@
   color: rgba(0, 0, 0, 0.7);
 }
 
+:root[data-theme="light"] .preview th,
+:root[data-theme="light"] .preview td {
+  border-color: rgba(0, 0, 0, 0.15);
+}
+
+:root[data-theme="light"] .preview th {
+  background: rgba(0, 0, 0, 0.04);
+}
+
 :root[data-theme="light"] .preview a {
-  color: #0066cc;
-  border-bottom-color: rgba(0, 102, 204, 0.3);
-}
-
-:root[data-theme="light"] .preview a:hover {
-  color: #0052a3;
-  border-bottom-color: rgba(0, 82, 163, 0.5);
-}
-
-:root[data-theme="light"] .checkbox-input {
-  accent-color: #0066cc;
+  color: var(--accent-primary);
+  border-bottom-color: color-mix(in srgb, var(--accent-primary, #0066cc) 30%, transparent);
 }
 
 :root[data-theme="light"] .setting-item:hover {
@@ -165,7 +177,6 @@
 /* Light theme tweaks for keyboard keys */
 :root[data-theme="light"] kbd {
   background: rgba(0, 0, 0, 0.06);
-  color: #111;
   border: 1px solid rgba(0, 0, 0, 0.08);
   box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.4);
 }
@@ -184,7 +195,6 @@
 
 :root[data-theme="light"] .badge-reworked {
   background: linear-gradient(135deg, rgba(255, 43, 209, 0.305), rgba(227, 37, 230, 0.344));
-  color: #ffffff;
   border-color: rgb(255, 107, 225);
 }
 
@@ -198,6 +208,11 @@
   background: linear-gradient(135deg, rgba(255, 150, 50, 0.15), rgba(200, 100, 30, 0.15));
   color: #cc6600;
   border-color: rgba(200, 100, 30, 0.4);
+}
+:root[data-theme="light"] .badge-info {
+  background: linear-gradient(135deg, rgba(51, 55, 66, 0.15), rgba(50, 100, 200, 0.15));
+  color: #3366cc;
+  border-color: rgba(50, 100, 200, 0.4);
 }
 
 /* Light theme select dropdown */
@@ -213,9 +228,9 @@
 }
 
 :root[data-theme="light"] .theme-select:focus {
-  border-color: rgba(0, 102, 204, 0.6);
+  border-color: color-mix(in srgb, var(--accent-primary, #0066cc) 60%, transparent);
   background: rgba(0, 0, 0, 0.08);
-  box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.15);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-primary, #0066cc) 15%, transparent);
 }
 
 :root[data-theme="light"] .theme-select option {

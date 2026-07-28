@@ -21,7 +21,7 @@
   width: 20px;
   height: 20px;
   cursor: pointer;
-  accent-color: #a8b5ff;
+  accent-color: var(--accent-primary, #a8b5ff);
 }
 
 .checkbox-label {
@@ -58,9 +58,9 @@
 
 .theme-select:focus {
   outline: none;
-  border-color: rgba(168, 181, 255, 0.6);
+  border-color: color-mix(in srgb, var(--accent-primary, #a8b5ff) 60%, transparent);
   background: rgba(0, 0, 0, 0.15);
-  box-shadow: 0 0 0 3px rgba(168, 181, 255, 0.15);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-primary, #a8b5ff) 15%, transparent);
 }
 
 .theme-select option {

@@ -14,10 +14,62 @@ export interface PatchEntry {
 
 export const patchNotes: PatchNote[] = [
   {
+    version: '2.0.0',
+    title: 'The Loadout Update',
+    date: 'August 2026, Current',
+    defaultOpen: true,
+    entries: [
+      {
+        badge: 'major',
+        title: 'Customized style buttons loadout:',
+        description: 'now user can choose which style buttons to show in the toolbar and their order in it'
+      },
+      {
+        badge: 'major',
+        title: 'New style buttons:',
+        description: 'added new style buttons for toolbar actions and export functionality. Details is shown in settings tab of this modal'
+      },
+      {
+        badge: 'new',
+        title: 'Settings export and import:',
+        description: 'added new options that allows to export and import current settings to/from a file'
+      },
+      {
+        badge: 'new',
+        title: 'Custom accent color:',
+        description: 'added a new option in accent color settings that allows users to choose their own custom accent color'
+      },
+      {
+        badge: 'new',
+        title: 'Even more icons:',
+        description: 'added even more new icons for buttons, settings and info page categories for better visual distinction and aesthetics'
+      },
+      {
+        badge: 'reworked',
+        title: 'Settings rearrangement:',
+        description: 'majority of settings have been rearranged and properly grouped into categories for better usability and easier finding'
+      },
+      {
+        badge: 'improved',
+        title: 'Accent color:',
+        description: 'now even more styles are affected by accent color'
+      },
+      {
+        badge: 'improved',
+        title: 'Light theme styles:',
+        description: 'now light theme styles are more readable'
+      },
+      {
+        badge: 'improved',
+        title: 'Bugfixes:',
+        description: 'Fixed some bugs and visual issues occurred in previous update'
+      }
+    ]
+  },
+  {
     version: '1.4.0',
     title: 'The Accent Update',
-    date: 'July 2026, Current',
-    defaultOpen: true,
+    date: 'July 2026',
     entries: [
       {
         badge: 'major',
