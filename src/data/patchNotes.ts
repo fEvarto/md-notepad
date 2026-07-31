@@ -32,7 +32,7 @@ export const patchNotes: PatchNote[] = [
       {
         badge: 'new',
         title: 'Settings export and import:',
-        description: 'added new options that allows to export and import current settings to/from a file'
+        description: 'added new options that allows to export and import current settings to/from a file in case of transfer to another device'
       },
       {
         badge: 'new',
