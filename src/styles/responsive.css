@@ -35,7 +35,8 @@
 
 /* Mobile layout - vertical stacking */
 @media (max-width: 768px) {
-  .editor-main {
+    .editor-main {
+    position: relative;
     flex-direction: column;
   }
 
@@ -54,18 +55,28 @@
     scrollbar-gutter: stable;
   }
 
-  .editor-textarea {
+    .editor-textarea {
     scrollbar-gutter: stable;
     min-width: 0;
+    width: 100% !important;
+    padding-left: calc(1rem + var(--line-numbers-width));
   }
 
+  /* Keep the line-number gutter beside the editor when the panes stack. */
   .editor-line-numbers {
-    padding: 1rem 0.4rem;
-    font-size: 14px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    box-sizing: border-box;
+    width: calc(var(--line-numbers-width) - 1px) !important;
+    height: 100%;
+    padding: 1rem 0.75rem;
+    font-size: 16px;
   }
 
   .line-number {
-    font-size: 0.85em;
+    font-size: 1em;
     opacity: 0.5;
   }
 

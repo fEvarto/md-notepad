@@ -52,6 +52,15 @@ export function CodeIcon(props: SVGProps<SVGSVGElement>) {
   )
 }
 
+export function SpoilerIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...iconProps(props)}>
+      <rect x="3" y="6" width="18" height="12" rx="2" />
+      <path d="M7 10h10M7 14h6" />
+    </svg>
+  )
+}
+
 export function HeadingIcon(props: SVGProps<SVGSVGElement>) {
   return (
     <svg {...filledIconProps(props)}>

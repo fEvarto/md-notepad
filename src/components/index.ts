@@ -1,6 +1,5 @@
 export { Toolbar } from './Toolbar'
 export { Editor } from './Editor'
 export { Preview } from './Preview'
-export { InfoModal } from './InfoModal'
 export { CollapsibleSection } from './CollapsibleSection'
 export { StatusBar } from './StatusBar'

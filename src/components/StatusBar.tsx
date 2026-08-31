@@ -7,7 +7,7 @@ interface StatusBarProps {
   spellCheck: boolean
   cursorPosition: number
   realTimePreview: boolean
-  previewMode: 'split' | 'separate'
+  previewMode: 'split' | 'separate' | 'in-preview'
   isPreviewActive: boolean
   onSpellCheckToggle: () => void
   onManualPreviewUpdate: () => void

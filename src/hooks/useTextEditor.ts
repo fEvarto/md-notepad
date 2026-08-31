@@ -7,6 +7,8 @@ export function useTextEditor(
 ): {
   applyWrap: (before: string, after?: string) => void
   toggleWrap: (before: string, after?: string) => boolean
+  applySpoiler: () => void
+  toggleSpoiler: () => boolean
   applyLinePrefix: (prefix: string) => void
   applyLink: () => void
   applyImage: () => void
@@ -65,6 +67,10 @@ export function useTextEditor(
     applyWrap(before, after)
     return false
   }, [value, setValue, textareaRef, applyWrap])
+
+  const applySpoiler = useCallback(() => applyWrap('||'), [applyWrap])
+
+  const toggleSpoiler = useCallback(() => toggleWrap('||'), [toggleWrap])
 
   const applyLinePrefix = useCallback((prefix: string) => {
     const ta = textareaRef.current
@@ -193,9 +199,11 @@ export function useTextEditor(
     URL.revokeObjectURL(url)
   }, [value])
 
-  return {
+    return {
     applyWrap,
     toggleWrap,
+    applySpoiler,
+    toggleSpoiler,
     applyLinePrefix,
     applyLink,
     applyImage,

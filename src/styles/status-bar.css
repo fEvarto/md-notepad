@@ -33,7 +33,7 @@
 
 .status-right-group {
   justify-content: flex-end;
-  flex: 0 1 auto;
+  flex: 1 1 auto;
 }
 
 .status-item {

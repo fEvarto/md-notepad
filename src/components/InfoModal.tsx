@@ -22,8 +22,12 @@ interface InfoModalProps {
   onShowShadowChange: (value: boolean) => void
   realTimePreview: boolean
   onRealTimePreviewChange: (value: boolean) => void
-  previewMode: 'split' | 'separate'
-  onPreviewModeChange: (mode: 'split' | 'separate') => void
+    previewMode: 'split' | 'separate' | 'in-preview'
+  onPreviewModeChange: (mode: 'split' | 'separate' | 'in-preview') => void
+  showPreviewExportButton: boolean
+  onShowPreviewExportButtonChange: (value: boolean) => void
+  previewExportButtonPosition: 'top-right' | 'bottom-right'
+  onPreviewExportButtonPositionChange: (position: 'top-right' | 'bottom-right') => void
   spellCheck: boolean
   onSpellCheckChange: (value: boolean) => void
   showLineNumbers: boolean
@@ -56,8 +60,12 @@ export function InfoModal({
   onShowShadowChange,
   realTimePreview,
   onRealTimePreviewChange,
-  previewMode,
+    previewMode,
   onPreviewModeChange,
+  showPreviewExportButton,
+  onShowPreviewExportButtonChange,
+  previewExportButtonPosition,
+  onPreviewExportButtonPositionChange,
   spellCheck,
   onSpellCheckChange,
   showLineNumbers,
@@ -218,7 +226,16 @@ export function InfoModal({
               {patchNotes.map((patch) => (
                 <CollapsibleSection 
                   key={patch.version} 
-                  title={`${patch.title}${patch.date ? ` (${patch.date})` : ''}`}
+                                    title={(
+                    <>
+                      {patch.badges?.map((badge) => (
+                        <span key={badge} className={`badge badge-${badge}`}>
+                          {badge.charAt(0).toUpperCase() + badge.slice(1)}
+                        </span>
+                      ))}
+                      <span>{`${patch.title}${patch.date ? ` (${patch.date})` : ''}`}</span>
+                    </>
+                  )}
                   defaultOpen={patch.defaultOpen || false}
                 >
                   <ul className="tips-list">
@@ -336,7 +353,7 @@ export function InfoModal({
 
               <div className="settings-category-header">
                 <h3 className="settings-category-title">Toolbar</h3>
-                <p className="settings-category-desc">Choose which markdown style buttons appear and in what order</p>
+                <p className="settings-category-desc">Choose which markdown style buttons appear and in which order</p>
               </div>
               <div className="settings-group">
                               <ToolbarLoadoutEditor
@@ -361,11 +378,12 @@ export function InfoModal({
                     type="checkbox"
                     checked={realTimePreview}
                     onChange={(e) => onRealTimePreviewChange(e.target.checked)}
+                    disabled={previewMode === 'in-preview'}
                     className="checkbox-input"
                   />
                   <span className="checkbox-label">Real-Time Preview</span>
                 </label>
-                <small>When disabled, use the "Update Preview" button to refresh the rendered preview manually.</small>
+                <small>{previewMode === 'in-preview' ? 'In-preview editing always updates as you type so formatting remains visible.' : 'When disabled, use the "Update Preview" button to refresh the rendered preview manually.'}</small>
                 <label className="setting-item">
                   <input
                     type="checkbox"
@@ -403,12 +421,43 @@ export function InfoModal({
                     type="radio"
                     name="preview-mode"
                     checked={previewMode === 'separate'}
-                    onChange={() => onPreviewModeChange('separate')}
+                      onChange={() => onPreviewModeChange('separate')}
+                      className="checkbox-input"
+                    />
+                    <span className="checkbox-label">Separate preview window</span>
+                </label>
+                <label className="setting-item">
+                    <input
+                      type="radio"
+                      name="preview-mode"
+                      checked={previewMode === 'in-preview'}
+                      onChange={() => onPreviewModeChange('in-preview')}
+                      className="checkbox-input"
+                    />
+                    <span className="checkbox-label">In-preview editing (beta)</span>
+                </label>
+                <small>Split mode shows editor and preview side-by-side. Separate mode swaps the main area between editor and preview. In-preview editing combines both panes so formatting is visible while you type.</small>
+                <label className="setting-item">
+                  <input
+                    type="checkbox"
+                    checked={showPreviewExportButton}
+                    onChange={(e) => onShowPreviewExportButtonChange(e.target.checked)}
                     className="checkbox-input"
                   />
-                  <span className="checkbox-label">Separate preview window</span>
+                  <span className="checkbox-label">Show Export button in preview</span>
                 </label>
-                <small>Split mode shows editor and preview side-by-side. Separate mode swaps the main area between editor and preview using toolbar toggle button.</small>
+                <label className="setting-item">
+                  <span className="checkbox-label">Export button position</span>
+                  <select
+                    value={previewExportButtonPosition}
+                    onChange={(e) => onPreviewExportButtonPositionChange(e.target.value as 'top-right' | 'bottom-right')}
+                    className="theme-select"
+                    disabled={!showPreviewExportButton}
+                  >
+                    <option value="top-right">Right top corner</option>
+                    <option value="bottom-right">Right bottom corner</option>
+                  </select>
+                </label>
               </div>
 
               <h3>Editor Keyboard Shortcuts</h3>

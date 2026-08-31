@@ -178,9 +178,8 @@ kbd + kbd {
 /* Badge/Highlight styles for What's New */
 .badge {
   display: inline-block;
-  padding: 0.25rem 0.6rem;
-  margin-right: 0.5rem;
-  margin-bottom: 0.25rem;
+  padding: 0.25rem 0.4rem;
+  margin-right: 0.3rem;
   border-radius: 4px;
   font-size: 0.75rem;
   font-weight: 600;
@@ -188,6 +187,12 @@ kbd + kbd {
   letter-spacing: 0.5px;
   white-space: nowrap;
   vertical-align: middle;
+}
+
+.badge-current {
+  background: linear-gradient(135deg, rgba(100, 200, 255, 0.3), rgba(50, 150, 255, 0.3));
+  color: #99ccff;
+  border: 1px solid rgba(100, 200, 255, 0.5);
 }
 
 .badge-major {

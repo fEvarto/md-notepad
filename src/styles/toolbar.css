@@ -41,6 +41,19 @@
   box-shadow: 0 5px 15px rgba(255, 255, 255, 0.2);
 }
 
+.toolbar button.active {
+  color: var(--accent-primary, #4a9eff);
+  background: color-mix(in srgb, var(--accent-primary, #4a9eff) 20%, transparent);
+  border-color: color-mix(in srgb, var(--accent-primary, #4a9eff) 65%, transparent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent-primary, #4a9eff) 20%, transparent) inset;
+}
+
+.toolbar button.active:hover {
+  background: color-mix(in srgb, var(--accent-primary, #4a9eff) 30%, transparent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent-primary, #4a9eff) 35%, transparent) inset;
+}
+
+
 .toolbar-icon,
 .tab-button-icon {
   display: inline-flex;
@@ -125,6 +138,7 @@
 }
 
 .filename-input {
+  margin-left: auto;
   padding: 0.4rem 0.6rem;
   border-radius: 6px;
   border: 1px solid rgba(212, 212, 212, 0.2);

@@ -1,5 +1,9 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { Toolbar, Editor, Preview, InfoModal, StatusBar } from './components'
+import React, { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react'
+import { Toolbar, Editor, Preview, StatusBar } from './components'
+
+const InfoModal = lazy(() =>
+  import('./components/InfoModal').then(({ InfoModal: Modal }) => ({ default: Modal }))
+)
 import { useSettings, useResponsiveLayout, useResizer, useTextEditor } from './hooks'
 import {
   getVisibleToolbarButtons,
@@ -19,6 +23,38 @@ function getInitialEditorContent(): string {
   }
 }
 
+function getActiveStyles(value: string, start: number, end: number): Array<'bold' | 'italic' | 'inlineCode' | 'spoiler'> {
+  if (start >= end) return []
+
+  const hasWrap = (before: string, after = before) =>
+    start >= before.length &&
+    end + after.length <= value.length &&
+    value.slice(start - before.length, start) === before &&
+    value.slice(end, end + after.length) === after
+
+    const markerRunLength = (position: number, direction: -1 | 1, marker: string) => {
+    let length = 0
+    while (
+      direction === -1
+        ? value.slice(position - length - 1, position - length) === marker
+        : value.slice(position + length, position + length + 1) === marker
+    ) {
+      length += 1
+    }
+    return length
+  }
+
+  const styles: Array<'bold' | 'italic' | 'inlineCode' | 'spoiler'> = []
+  if (hasWrap('**')) styles.push('bold')
+  // Double stars are bold, while triple stars represent both styles.
+  const leftStars = markerRunLength(start, -1, '*')
+  const rightStars = markerRunLength(end, 1, '*')
+  if (leftStars === rightStars && (leftStars === 1 || leftStars >= 3)) styles.push('italic')
+  if (hasWrap('`')) styles.push('inlineCode')
+  if (hasWrap('||')) styles.push('spoiler')
+  return styles
+}
+
 function App(): React.JSX.Element {
   const [value, setValue] = useState<string>(getInitialEditorContent())
   const [filename, setFilename] = useState<string>('note.md')
@@ -28,14 +64,15 @@ function App(): React.JSX.Element {
   const [previewValue, setPreviewValue] = useState<string>(value)
   const [shownPane, setShownPane] = useState<'editor' | 'preview'>('editor')
   const [cursorPosition, setCursorPosition] = useState<number>(0)
-  const [wrapToggleFeedback, setWrapToggleFeedback] = useState<'bold' | 'italic' | 'code' | null>(null)
+  const [selection, setSelection] = useState({ start: 0, end: 0 })
+  const [wrapToggleFeedback, setWrapToggleFeedback] = useState<'bold' | 'italic' | 'code' | 'spoiler' | null>(null)
   const textareaRef = useRef<HTMLTextAreaElement | null>(null)
   const containerRef = useRef<HTMLDivElement | null>(null)
 
   const { isColumnLayout, isPhoneLayout, isTabletLayout } = useResponsiveLayout()
-  const { theme, highPerformance, showBackdrop, showShadow, realTimePreview, previewMode, spellCheck, showLineNumbers, accentColor, customAccentColor, toolbarButtonOrder, visibleToolbarButtons, setTheme, setHighPerformance, setShowBackdrop, setShowShadow, setRealTimePreview, setPreviewMode, setSpellCheck, setShowLineNumbers, setAccentColor, setCustomAccentColor, setToolbarButtonOrder, setVisibleToolbarButtons, resetToDefaults, exportSettingsToFile, importSettingsFromFile } = useSettings()
+  const { theme, highPerformance, showBackdrop, showShadow, realTimePreview, previewMode, showPreviewExportButton, previewExportButtonPosition, spellCheck, showLineNumbers, accentColor, customAccentColor, toolbarButtonOrder, visibleToolbarButtons, setTheme, setHighPerformance, setShowBackdrop, setShowShadow, setRealTimePreview, setPreviewMode, setShowPreviewExportButton, setPreviewExportButtonPosition, setSpellCheck, setShowLineNumbers, setAccentColor, setCustomAccentColor, setToolbarButtonOrder, setVisibleToolbarButtons, resetToDefaults, exportSettingsToFile, importSettingsFromFile } = useSettings()
   const { handleSeparatorMouseDown, handleSeparatorTouchStart } = useResizer(editorSize, setEditorSize, containerRef)
-  const { applyWrap, toggleWrap, applyLinePrefix, applyLink, applyImage, applyCodeBlock, applyTable, exportMarkdown } = useTextEditor(value, setValue, textareaRef)
+  const { applyWrap, toggleWrap, applySpoiler, toggleSpoiler, applyLinePrefix, applyLink, applyImage, applyCodeBlock, applyTable, exportMarkdown } = useTextEditor(value, setValue, textareaRef)
   const maxStyleButtons = useMemo(() => {
     if (isPhoneLayout) return PHONE_MAX_VISIBLE_BUTTONS
     if (isTabletLayout) return TABLET_MAX_VISIBLE_BUTTONS
@@ -45,6 +82,11 @@ function App(): React.JSX.Element {
   const totalEnabledStyleButtons = useMemo(
     () => getVisibleToolbarButtons(toolbarButtonOrder, visibleToolbarButtons).length,
     [toolbarButtonOrder, visibleToolbarButtons]
+  )
+
+  const activeStyles = useMemo(
+    () => getActiveStyles(value, selection.start, selection.end),
+    [value, selection]
   )
 
   const finalVisibleToolbarButtons = useMemo(
@@ -65,9 +107,13 @@ function App(): React.JSX.Element {
         const didRemove = toggleWrap('*')
         if (didRemove) setWrapToggleFeedback('italic')
       },
-      onCode: () => {
+            onCode: () => {
         const didRemove = toggleWrap('`')
         if (didRemove) setWrapToggleFeedback('code')
+      },
+      onSpoiler: () => {
+        const didRemove = toggleSpoiler()
+        if (didRemove) setWrapToggleFeedback('spoiler')
       },
       onH1: () => applyLinePrefix('# '),
       onH2: () => applyLinePrefix('## '),
@@ -78,7 +124,7 @@ function App(): React.JSX.Element {
       onCodeBlock: applyCodeBlock,
       onTable: applyTable,
     }),
-    [toggleWrap, applyLinePrefix, applyLink, applyImage, applyCodeBlock, applyTable]
+    [toggleWrap, toggleSpoiler, applyLinePrefix, applyLink, applyImage, applyCodeBlock, applyTable]
   )
 
   // Save editor content to localStorage whenever it changes
@@ -131,6 +177,12 @@ function App(): React.JSX.Element {
         if (key === 'k' && !e.altKey) {
           e.preventDefault()
           applyWrap('`')
+          return
+        }
+
+        if (e.altKey && key === 's') {
+          e.preventDefault()
+          applySpoiler()
           return
         }
 
@@ -212,7 +264,7 @@ function App(): React.JSX.Element {
 
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
-  }, [applyWrap, applyLinePrefix, applyLink, applyImage, applyCodeBlock, applyTable, exportMarkdown, filename, spellCheck, setSpellCheck, showLineNumbers, setShowLineNumbers, previewMode, setShownPane, realTimePreview, setRealTimePreview])
+  }, [applyWrap, applySpoiler, applyLinePrefix, applyLink, applyImage, applyCodeBlock, applyTable, exportMarkdown, filename, spellCheck, setSpellCheck, showLineNumbers, setShowLineNumbers, previewMode, setShownPane, realTimePreview, setRealTimePreview])
 
   return (
     <div className="editor-app">
@@ -220,14 +272,34 @@ function App(): React.JSX.Element {
         filename={filename}
         onFilenameChange={setFilename}
         onExport={exportMarkdown}
+        showExportButton={!showPreviewExportButton}
         visibleButtons={finalVisibleToolbarButtons}
         totalStyleButtonsCount={totalEnabledStyleButtons}
         actions={toolbarActions}
         onInfoClick={() => setShowInfo(true)}
         wrapToggleFeedback={wrapToggleFeedback}
+        activeStyles={activeStyles}
       />
 
-      {previewMode === 'split' ? (
+            {previewMode === 'in-preview' ? (
+        <div className="preview in-preview-editor">
+          <Preview
+            value={value}
+            editorSize={100}
+            isColumnLayout={isColumnLayout}
+            isStandalone
+            editable
+            spellCheck={false}
+            onChange={setValue}
+            textareaRef={textareaRef}
+            onCursorPositionChange={setCursorPosition}
+            onSelectionChange={(start, end) => setSelection({ start, end })}
+            showExportButton={showPreviewExportButton}
+            exportButtonPosition={previewExportButtonPosition}
+            onExport={() => exportMarkdown(filename)}
+          />
+        </div>
+      ) : previewMode === 'split' ? (
         <Editor
           value={value}
           onChange={setValue}
@@ -241,8 +313,9 @@ function App(): React.JSX.Element {
           spellCheck={spellCheck}
           showLineNumbers={showLineNumbers}
           onCursorPositionChange={setCursorPosition}
+          onSelectionChange={(start, end) => setSelection({ start, end })}
         >
-          <Preview value={realTimePreview ? value : previewValue} editorSize={editorSize} isColumnLayout={isColumnLayout} />
+          <Preview value={realTimePreview ? value : previewValue} editorSize={editorSize} isColumnLayout={isColumnLayout} showExportButton={showPreviewExportButton} exportButtonPosition={previewExportButtonPosition} onExport={() => exportMarkdown(filename)} />
         </Editor>
       ) : shownPane === 'editor' ? (
         <Editor
@@ -258,16 +331,18 @@ function App(): React.JSX.Element {
           spellCheck={spellCheck}
           showLineNumbers={showLineNumbers}
           onCursorPositionChange={setCursorPosition}
+          onSelectionChange={(start, end) => setSelection({ start, end })}
         />
       ) : (
 
         <div className="preview central">
-          <Preview value={realTimePreview ? value : previewValue} editorSize={editorSize} isColumnLayout={isColumnLayout} />
-        </div>
+          <Preview value={realTimePreview ? value : previewValue} editorSize={editorSize} isColumnLayout={isColumnLayout} isStandalone showExportButton={showPreviewExportButton} exportButtonPosition={previewExportButtonPosition} onExport={() => exportMarkdown(filename)} />
+                  </div>
       )}
 
-      <InfoModal
-        isOpen={showInfo}
+            <Suspense fallback={null}>
+        <InfoModal
+          isOpen={showInfo}
         onClose={() => {
           setShowInfo(false)
           setActiveTab('info')
@@ -284,8 +359,12 @@ function App(): React.JSX.Element {
         onShowShadowChange={setShowShadow}
         realTimePreview={realTimePreview}
         onRealTimePreviewChange={setRealTimePreview}
-        previewMode={previewMode}
+                previewMode={previewMode}
         onPreviewModeChange={setPreviewMode}
+        showPreviewExportButton={showPreviewExportButton}
+        onShowPreviewExportButtonChange={setShowPreviewExportButton}
+        previewExportButtonPosition={previewExportButtonPosition}
+        onPreviewExportButtonPositionChange={setPreviewExportButtonPosition}
         spellCheck={spellCheck}
         onSpellCheckChange={setSpellCheck}
         showLineNumbers={showLineNumbers}
@@ -300,8 +379,9 @@ function App(): React.JSX.Element {
         onVisibleToolbarButtonsChange={setVisibleToolbarButtons}
         onResetToDefaults={resetToDefaults}
         onExportSettings={exportSettingsToFile}
-        onImportSettings={importSettingsFromFile}
-      />
+                onImportSettings={importSettingsFromFile}
+        />
+      </Suspense>
 
       <StatusBar
         text={value}
@@ -312,7 +392,7 @@ function App(): React.JSX.Element {
         realTimePreview={realTimePreview}
         onManualPreviewUpdate={() => setPreviewValue(value)}
         previewMode={previewMode}
-        isPreviewActive={shownPane === 'preview'}
+        isPreviewActive={previewMode === 'separate' && shownPane === 'preview'}
         onSwitchPreviewPanel={() => setShownPane((prev) => (prev === 'editor' ? 'preview' : 'editor'))}
       />
     </div>

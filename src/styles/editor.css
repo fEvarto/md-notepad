@@ -47,13 +47,14 @@
 }
 
 .preview {
+  position: relative;
   display: block;
   border-left: 1px solid rgba(255, 255, 255, 0.04);
   overflow-y: auto;
   padding: 1rem;
   box-sizing: border-box;
   scrollbar-gutter: stable;
-  line-height: 1.6;
+  line-height: 2.66;
   word-wrap: break-word;
   -webkit-hyphens: auto;
   hyphens: auto;
@@ -61,7 +62,58 @@
   overflow-wrap: break-word;
 }
 
+.preview-export-button {
+  position: absolute;
+  right: 5px;
+  z-index: 2;
+  inset-inline-end: 5px;
+  width: 44px;
+  height: 44px;
+  box-sizing: border-box;
+  padding: 0.35rem;
+  border: 1px solid color-mix(in srgb, var(--accent-primary, #667eea) 55%, transparent);
+  border-radius: 5px;
+    color: #fff;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font: inherit;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.preview-export-icon {
+
+  display: inline-flex;
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
+.preview-export-icon svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.preview--top-right .preview-export-button {
+  top: 1rem;
+}
+
+.preview--bottom-right .preview-export-button {
+  bottom: 1rem;
+}
+
+.preview-export-button:hover {
+  filter: brightness(1.1);
+}
+
+.preview-export-button:focus-visible {
+  outline: 2px solid var(--accent-primary, #a8b5ff);
+  outline-offset: 2px;
+}
+
 .preview p {
+
   margin: 0.5rem 0;
 }
 
@@ -154,3 +206,26 @@
   color: #c4d1ff;
   border-bottom-color: rgba(196, 209, 255, 0.6);
 }
+
+.preview .spoiler {
+  display: inline;
+  background: currentColor;
+  border-radius: 3px;
+  color: #393939;
+  cursor: pointer;
+  padding: 0 0.2em;
+  transition: color 160ms ease, background-color 160ms ease;
+  user-select: none;
+}
+
+.preview .spoiler--revealed {
+  background: rgba(255, 255, 255, 0.08);
+  color: inherit;
+  user-select: text;
+}
+
+.preview .spoiler:focus-visible {
+  outline: 2px solid rgba(168, 181, 255, 0.8);
+  outline-offset: 2px;
+}
+

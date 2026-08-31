@@ -28,11 +28,78 @@
   background: rgba(255, 255, 255, 0.08);
 }
 
+/* In-preview editing keeps the preview as the active editing surface. */
+.in-preview-editor {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  padding: 0;
+}
+
+.in-preview-editor > .preview {
+  flex: 1 1 auto;
+  width: 100%;
+  height: 100%;
+  border-left: none;
+}
+
+.preview-editor-surface {
+  position: relative;
+  min-height: 100%;
+  width: 100%;
+  cursor: text;
+  outline: none;
+}
+
+.preview-editor-rendered {
+  position: relative;
+  z-index: 0;
+  min-height: 100%;
+}
+
+.preview-editor-source {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  border: none;
+  resize: none;
+  background: transparent;
+  color: transparent;
+  caret-color: var(--accent-primary, #667eea);
+  font: inherit;
+  font-family: inherit;
+  line-height: 1.6;
+  letter-spacing: inherit;
+  padding: 0;
+  box-sizing: border-box;
+  overflow: auto;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+  -webkit-text-fill-color: transparent;
+  outline: none;
+}
+
+.preview-editor-source::selection {
+  background: color-mix(in srgb, var(--accent-primary, #667eea) 35%, transparent);
+}
+
+.preview--editable .preview-editor-surface:focus-within {
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent-primary, #667eea) 35%, transparent);
+}
+
 /* Separate preview mode full screen support */
 .preview.central {
   flex: 1 1 auto;
   display: flex;
   width: 100%;
+  padding: 0;
   min-height: 0;
 }
 
@@ -40,6 +107,8 @@
 .preview.central > div.preview {
   flex: 1 1 auto;
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
   height: 100%;
   min-height: 0;
   border-left: none;

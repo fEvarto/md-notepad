@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 
 interface CollapsibleSectionProps {
-  title: string
+  title: React.ReactNode
   children: React.ReactNode
   defaultOpen?: boolean
 }

@@ -3,6 +3,7 @@ export interface PatchNote {
   title: string
   date: string
   defaultOpen?: boolean
+  badges?: Array<'major' | 'current'>
   entries: PatchEntry[]
 }
 
@@ -14,10 +15,59 @@ export interface PatchEntry {
 
 export const patchNotes: PatchNote[] = [
   {
+    version: '2.1.0',
+    title: 'Le Idée Fixe',
+    date: 'September 2026',
+    defaultOpen: true,
+    badges: ['current'],
+    entries: [
+      {
+        badge: 'major',
+        title: 'In-preview editor, part I:',
+        description: 'added a new option in settings that allows to edit text directly in the preview pane with all the features of the editor pane, including hotkeys and toolbar buttons. Currently this feature is in beta so any feedback will be useful to finish it in the next updates'
+      },
+      {
+        badge: 'new',
+        title: 'Spoiler mode:',
+        description: 'first non-markdown style comes in: this style allows to hide content until user clicks on it. Could be incompatible with other MD readers and editors'
+      },
+      {
+        badge: 'new',
+        title: 'Separate export button:',
+        description: 'added new option that allows placing export button on a preview pane. User can choose button location'
+      },
+      {
+        badge: 'improved',
+        title: 'Better patch notes:',
+        description: 'now major updates are highlighted among other ones and added an info section for each update'
+      },
+      {
+        badge: 'improved',
+        title: 'Better line number mode:',
+        description: 'now it does greatly better on tablets and syncs with a editor pane on scrolling'
+      },
+      {
+        badge: 'improved',
+        title: 'Styles highlights:',
+        description: 'now applied styles are highlighted on the toolbar if they are applied to selected text'
+      },
+      {
+        badge: 'improved',
+        title: 'Optimization:',
+        description: 'now app is more optimized and responsive after gaining major updates'
+      },
+      {
+        badge: 'improved',
+        title: 'Bugfixes:',
+        description: 'Fixed some bugs and visual issues occurred in previous update'
+      }
+    ]
+  },
+  {
     version: '2.0.0',
     title: 'The Loadout Update',
-    date: 'August 2026, Current',
-    defaultOpen: true,
+    date: 'August 2026',
+    badges: ['major'],
     entries: [
       {
         badge: 'major',
@@ -70,6 +120,7 @@ export const patchNotes: PatchNote[] = [
     version: '1.4.0',
     title: 'The Accent Update',
     date: 'July 2026',
+    badges: [],
     entries: [
       {
         badge: 'major',
@@ -102,6 +153,7 @@ export const patchNotes: PatchNote[] = [
     version: '1.3.0',
     title: 'The Key Update',
     date: 'June 2026',
+    badges: [],
     entries: [
       {
         badge: 'major',
@@ -134,6 +186,7 @@ export const patchNotes: PatchNote[] = [
     version: '1.2.0',
     title: 'The Spotlight Update',
     date: 'May 2026',
+    badges: [],
     entries: [
       {
         badge: 'major',
@@ -171,6 +224,7 @@ export const patchNotes: PatchNote[] = [
     version: '1.1.0',
     title: 'Keep Calm and Have a Fresh View',
     date: 'April 2026',
+    badges: [],
     entries: [
       {
         badge: 'major',
@@ -203,6 +257,7 @@ export const patchNotes: PatchNote[] = [
     version: '1.0.0',
     title: 'The Accessibility Update',
     date: 'March 2026',
+    badges: [],
     entries: [
       {
         badge: 'major',
@@ -240,6 +295,7 @@ export const patchNotes: PatchNote[] = [
     version: '0.1.0',
     title: 'Initial Release',
     date: 'February 2026',
+    badges: ['major'],
     entries: [
       {
         badge: 'new',

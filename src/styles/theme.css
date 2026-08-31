@@ -71,10 +71,8 @@
   color: rgba(0, 0, 0, 0.35);
 }
 
-:root[data-theme="light"] .preview {
-  background: #ffffff;
-  color: #1a1a1a;
-  border-left-color: rgba(0, 0, 0, 0.1);
+:root[data-theme="light"] .preview-export-button {
+  color: #000000;
 }
 
 :root[data-theme="light"] .separator {
@@ -164,6 +162,10 @@
   border-bottom-color: color-mix(in srgb, var(--accent-primary, #0066cc) 30%, transparent);
 }
 
+:root[data-theme="light"] .preview .spoiler {
+  color: #555252;
+}
+
 :root[data-theme="light"] .setting-item:hover {
   color: rgba(0, 0, 0, 1);
 }
@@ -181,6 +183,12 @@
   box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.4);
 }
 /* Light theme badge styles */
+:root[data-theme="light"] .badge-current {
+  background: linear-gradient(135deg, rgba(50, 150, 255, 0.15), rgba(30, 100, 200, 0.15));
+  color: #0052a3;
+  border-color: rgba(30, 100, 200, 0.4);
+}
+
 :root[data-theme="light"] .badge-major {
   background: linear-gradient(135deg, rgba(255, 100, 100, 0.15), rgba(200, 50, 50, 0.15));
   color: #cc3333;

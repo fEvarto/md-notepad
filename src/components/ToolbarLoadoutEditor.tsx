@@ -10,6 +10,7 @@ import {
   ItalicIcon,
   LinkIcon,
   ListIcon,
+  SpoilerIcon,
   TableIcon,
 } from './Icons'
 import {
@@ -23,6 +24,7 @@ const TOOLBAR_BUTTON_SHORTCUTS: Record<ToolbarStyleButtonId, string> = {
   bold: 'Ctrl/Cmd + B',
   italic: 'Ctrl/Cmd + I',
   inlineCode: 'Ctrl/Cmd + K',
+  spoiler: 'Ctrl/Cmd + Alt + S',
   link: 'Ctrl/Cmd + Alt + U',
   image: 'Ctrl/Cmd + Alt + G',
   h1: 'Ctrl/Cmd + Alt + 1',
@@ -44,10 +46,12 @@ function ToolbarButtonIcon({ id }: { id: ToolbarStyleButtonId }): React.JSX.Elem
   switch (id) {
     case 'bold':
       return <BoldIcon />
-    case 'italic':
+        case 'italic':
       return <ItalicIcon />
     case 'inlineCode':
       return <CodeIcon />
+    case 'spoiler':
+      return <SpoilerIcon />
     case 'link':
       return <LinkIcon />
     case 'image':
@@ -137,9 +141,9 @@ export function ToolbarLoadoutEditor({
               <span className="toolbar-loadout-item-icon" aria-hidden="true">
                 <ToolbarButtonIcon id={id} />
               </span>
-              <span className="toolbar-loadout-item-label">{TOOLBAR_BUTTON_LABELS[id]}</span>
-                            <span className="toolbar-loadout-item-shortcut">{TOOLBAR_BUTTON_SHORTCUTS[id]}</span>
-                            <button
+                            <span className="toolbar-loadout-item-label">{TOOLBAR_BUTTON_LABELS[id]}</span>
+              <span className="toolbar-loadout-item-shortcut">{TOOLBAR_BUTTON_SHORTCUTS[id]}</span>
+              <button
                 type="button"
                 className={[
                   'toolbar-loadout-toggle',

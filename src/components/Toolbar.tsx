@@ -10,9 +10,10 @@ import {
   Heading2Icon,
   ImageIcon,
   InfoIcon,
-  ItalicIcon,
+    ItalicIcon,
   LinkIcon,
   ListIcon,
+  SpoilerIcon,
   TableIcon,
 } from './Icons'
 import type { ToolbarStyleButtonId } from '../utils/toolbarButtons'
@@ -21,6 +22,7 @@ export interface ToolbarMarkdownActions {
   onBold: () => void
   onItalic: () => void
   onCode: () => void
+  onSpoiler: () => void
   onH1: () => void
   onH2: () => void
   onList: () => void
@@ -35,17 +37,20 @@ interface ToolbarProps {
   filename: string
   onFilenameChange: (value: string) => void
   onExport: (filename: string) => void
+  showExportButton?: boolean
   visibleButtons: ToolbarStyleButtonId[]
   totalStyleButtonsCount: number
   actions: ToolbarMarkdownActions
   onInfoClick: () => void
-  wrapToggleFeedback: 'bold' | 'italic' | 'code' | null
+  wrapToggleFeedback: 'bold' | 'italic' | 'code' | 'spoiler' | null
+  activeStyles?: ToolbarStyleButtonId[]
 }
 
 function renderStyleButton(
   id: ToolbarStyleButtonId,
   actions: ToolbarMarkdownActions,
-  wrapToggleFeedback: 'bold' | 'italic' | 'code' | null
+    wrapToggleFeedback: 'bold' | 'italic' | 'code' | 'spoiler' | null,
+  activeStyles: ToolbarStyleButtonId[]
 ): React.JSX.Element | null {
   switch (id) {
     case 'bold':
@@ -56,7 +61,7 @@ function renderStyleButton(
           title="Bold (wrap selection)"
           onClick={actions.onBold}
           aria-label="Bold"
-          className={wrapToggleFeedback === 'bold' ? 'toggle-off' : ''}
+          className={`${activeStyles.includes('bold') ? 'active ' : ''}${wrapToggleFeedback === 'bold' ? 'toggle-off' : ''}`}
         >
           <span className="toolbar-icon" aria-hidden="true">
             <BoldIcon />
@@ -72,7 +77,7 @@ function renderStyleButton(
           title="Italic (wrap selection)"
           onClick={actions.onItalic}
           aria-label="Italic"
-          className={wrapToggleFeedback === 'italic' ? 'toggle-off' : ''}
+          className={`${activeStyles.includes('italic') ? 'active ' : ''}${wrapToggleFeedback === 'italic' ? 'toggle-off' : ''}`}
         >
           <span className="toolbar-icon" aria-hidden="true">
             <ItalicIcon />
@@ -88,12 +93,28 @@ function renderStyleButton(
           title="Inline code"
           onClick={actions.onCode}
           aria-label="Inline code"
-          className={wrapToggleFeedback === 'code' ? 'toggle-off' : ''}
+          className={`${activeStyles.includes('inlineCode') ? 'active ' : ''}${wrapToggleFeedback === 'code' ? 'toggle-off' : ''}`}
         >
           <span className="toolbar-icon" aria-hidden="true">
             <CodeIcon />
           </span>
           <Tooltip text="Inline code" keybind="Ctrl/Cmd+K" />
+        </button>
+      )
+        case 'spoiler':
+      return (
+        <button
+          key={id}
+          type="button"
+          title="Spoiler (wrap selection)"
+          onClick={actions.onSpoiler}
+          aria-label="Spoiler"
+          className={`${activeStyles.includes('spoiler') ? 'active ' : ''}${wrapToggleFeedback === 'spoiler' ? 'toggle-off' : ''}`}
+        >
+          <span className="toolbar-icon" aria-hidden="true">
+            <SpoilerIcon />
+          </span>
+          <Tooltip text="Spoiler (wrap selection)" keybind="Ctrl/Cmd+Alt+S" />
         </button>
       )
     case 'link':
@@ -177,17 +198,19 @@ export function Toolbar({
   filename,
   onFilenameChange,
   onExport,
+  showExportButton = true,
   visibleButtons,
   totalStyleButtonsCount,
   actions,
   onInfoClick,
   wrapToggleFeedback,
+  activeStyles = [],
 }: ToolbarProps): React.JSX.Element {
   const hiddenCount = totalStyleButtonsCount - visibleButtons.length
 
   return (
     <div className="toolbar">
-      {visibleButtons.map((id) => renderStyleButton(id, actions, wrapToggleFeedback))}
+      {visibleButtons.map((id) => renderStyleButton(id, actions, wrapToggleFeedback, activeStyles))}
       {hiddenCount > 0 && (
         <button
           type="button"
@@ -208,12 +231,14 @@ export function Toolbar({
         aria-label="Filename for export"
         placeholder="note.md"
       />
-      <button type="button" className="primary" onClick={() => onExport(filename)} aria-label="Export note">
-        <span className="toolbar-icon toolbar-icon-primary" aria-hidden="true">
-          <ExportIcon />
-        </span>
-        <Tooltip text="Export current note" keybind="Ctrl/Cmd+S" />
-      </button>
+            {showExportButton && (
+        <button type="button" className="primary" onClick={() => onExport(filename)} aria-label="Export note">
+          <span className="toolbar-icon toolbar-icon-primary" aria-hidden="true">
+            <ExportIcon />
+          </span>
+          <Tooltip text="Export current note" keybind="Ctrl/Cmd+S" />
+        </button>
+      )}
       <button type="button" title="Info" onClick={onInfoClick} aria-label="Open info and settings">
         <span className="toolbar-icon" aria-hidden="true">
           <InfoIcon />

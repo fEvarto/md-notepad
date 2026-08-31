@@ -18,13 +18,16 @@ import {
 export type { AccentColor } from '../utils/accentColor'
 export type { ToolbarStyleButtonId } from '../utils/toolbarButtons'
 
-interface Settings {
+export interface Settings {
+
   theme: 'system' | 'light' | 'dark'
   highPerformance: boolean
   showBackdrop: boolean
   showShadow: boolean
   realTimePreview: boolean
-  previewMode: 'split' | 'separate'
+  previewMode: 'split' | 'separate' | 'in-preview'
+  showPreviewExportButton: boolean
+  previewExportButtonPosition: 'top-right' | 'bottom-right'
   spellCheck: boolean
   showLineNumbers: boolean
   accentColor: AccentColor
@@ -40,6 +43,8 @@ export const DEFAULT_SETTINGS: Settings = {
   showShadow: true,
   realTimePreview: true,
   previewMode: 'split',
+  showPreviewExportButton: false,
+  previewExportButtonPosition: 'top-right',
   spellCheck: false,
   showLineNumbers: false,
   accentColor: 'blue',
@@ -50,13 +55,71 @@ export const DEFAULT_SETTINGS: Settings = {
 
 const SETTINGS_KEY = 'md-notepad-settings'
 
+function isTheme(value: unknown): value is Settings['theme'] {
+  return value === 'system' || value === 'light' || value === 'dark'
+}
+
+function isPreviewMode(value: unknown): value is Settings['previewMode'] {
+  return value === 'split' || value === 'separate' || value === 'in-preview'
+}
+
+function isPreviewExportButtonPosition(value: unknown): value is Settings['previewExportButtonPosition'] {
+  return value === 'top-right' || value === 'bottom-right'
+}
+
+/**
+ * Keep imported data limited to the settings currently supported by the UI.
+ * This also makes older exports forward-compatible as new defaults are added.
+ */
+function sanitizeSettings(input: Partial<Settings>): Partial<Settings> {
+  const sanitized: Partial<Settings> = {}
+
+  if (isTheme(input.theme)) sanitized.theme = input.theme
+  if (typeof input.highPerformance === 'boolean') sanitized.highPerformance = input.highPerformance
+  if (typeof input.showBackdrop === 'boolean') sanitized.showBackdrop = input.showBackdrop
+  if (typeof input.showShadow === 'boolean') sanitized.showShadow = input.showShadow
+  if (typeof input.realTimePreview === 'boolean') sanitized.realTimePreview = input.realTimePreview
+  if (isPreviewMode(input.previewMode)) sanitized.previewMode = input.previewMode
+  if (typeof input.showPreviewExportButton === 'boolean') {
+    sanitized.showPreviewExportButton = input.showPreviewExportButton
+  }
+  if (isPreviewExportButtonPosition(input.previewExportButtonPosition)) {
+    sanitized.previewExportButtonPosition = input.previewExportButtonPosition
+  }
+  if (typeof input.spellCheck === 'boolean') sanitized.spellCheck = input.spellCheck
+  if (typeof input.showLineNumbers === 'boolean') sanitized.showLineNumbers = input.showLineNumbers
+  if (typeof input.accentColor === 'string') sanitized.accentColor = parseAccentColor(input.accentColor)
+  if (typeof input.customAccentColor === 'string') {
+    sanitized.customAccentColor = parseCustomAccentColor(input.customAccentColor)
+  }
+  if (input.toolbarButtonOrder !== undefined) {
+    sanitized.toolbarButtonOrder = parseToolbarButtonOrder(input.toolbarButtonOrder)
+  }
+  if (input.visibleToolbarButtons !== undefined) {
+    sanitized.visibleToolbarButtons = parseToolbarVisibleButtons(input.visibleToolbarButtons)
+  }
+
+  return sanitized
+}
+
+function copySettings(settings: Settings): Settings {
+  return {
+    ...settings,
+    toolbarButtonOrder: [...settings.toolbarButtonOrder],
+    visibleToolbarButtons: [...settings.visibleToolbarButtons],
+  }
+}
+
+
 export function useSettings(): Settings & {
   setTheme: (theme: 'system' | 'light' | 'dark') => void
   setHighPerformance: (value: boolean) => void
   setShowBackdrop: (value: boolean) => void
   setShowShadow: (value: boolean) => void
   setRealTimePreview: (value: boolean) => void
-  setPreviewMode: (mode: 'split' | 'separate') => void
+  setPreviewMode: (mode: 'split' | 'separate' | 'in-preview') => void
+  setShowPreviewExportButton: (value: boolean) => void
+  setPreviewExportButtonPosition: (position: 'top-right' | 'bottom-right') => void
   setSpellCheck: (value: boolean) => void
   setShowLineNumbers: (value: boolean) => void
   setAccentColor: (color: AccentColor) => void
@@ -134,7 +197,7 @@ export function useSettings(): Settings & {
     return DEFAULT_SETTINGS.realTimePreview
   })
 
-  const [previewMode, setPreviewModeState] = useState<'split' | 'separate'>(() => {
+  const [previewMode, setPreviewModeState] = useState<'split' | 'separate' | 'in-preview'>(() => {
     try {
       const saved = localStorage.getItem(SETTINGS_KEY)
       if (saved) {
@@ -145,6 +208,25 @@ export function useSettings(): Settings & {
       console.error('Failed to load settings:', e)
     }
     return DEFAULT_SETTINGS.previewMode
+  })
+
+  const [showPreviewExportButton, setShowPreviewExportButtonState] = useState<boolean>(() => {
+    try {
+      const saved = localStorage.getItem(SETTINGS_KEY)
+      if (saved) return (JSON.parse(saved) as Partial<Settings>).showPreviewExportButton ?? DEFAULT_SETTINGS.showPreviewExportButton
+    } catch (e) { console.error('Failed to load settings:', e) }
+    return DEFAULT_SETTINGS.showPreviewExportButton
+  })
+
+  const [previewExportButtonPosition, setPreviewExportButtonPositionState] = useState<'top-right' | 'bottom-right'>(() => {
+    try {
+      const saved = localStorage.getItem(SETTINGS_KEY)
+      if (saved) {
+        const position = (JSON.parse(saved) as Partial<Settings>).previewExportButtonPosition
+        if (position === 'top-right' || position === 'bottom-right') return position
+      }
+    } catch (e) { console.error('Failed to load settings:', e) }
+    return DEFAULT_SETTINGS.previewExportButtonPosition
   })
 
   const [spellCheck, setSpellCheckState] = useState<boolean>(() => {
@@ -296,6 +378,8 @@ export function useSettings(): Settings & {
         showShadow,
         realTimePreview,
         previewMode,
+        showPreviewExportButton,
+        previewExportButtonPosition,
         spellCheck,
         showLineNumbers,
         accentColor,
@@ -313,6 +397,8 @@ export function useSettings(): Settings & {
             showShadow,
             realTimePreview,
             previewMode,
+            showPreviewExportButton,
+            previewExportButtonPosition,
             spellCheck,
             showLineNumbers,
             accentColor,
@@ -322,20 +408,26 @@ export function useSettings(): Settings & {
           ])
 
   const exportSettingsToFile = () => {
-    const settings: Settings = {
+        // Export the complete, current settings set. Keep this list in sync with
+    // DEFAULT_SETTINGS so every customizable option survives a transfer.
+    const settings = copySettings({
+      ...DEFAULT_SETTINGS,
       theme,
       highPerformance,
       showBackdrop,
       showShadow,
       realTimePreview,
       previewMode,
+      showPreviewExportButton,
+      previewExportButtonPosition,
       spellCheck,
       showLineNumbers,
       accentColor,
       customAccentColor,
       toolbarButtonOrder,
       visibleToolbarButtons,
-    }
+    })
+
     const blob = new Blob([JSON.stringify(settings, null, 2)], { type: 'application/json' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
@@ -360,16 +452,19 @@ export function useSettings(): Settings & {
         reader.onload = (e) => {
           try {
             const text = e.target?.result as string
-            const parsed = JSON.parse(text) as Partial<Settings>
+                        const parsed = sanitizeSettings(JSON.parse(text) as Partial<Settings>)
 
-            // Apply all parsed settings
+            // Apply only supported and validated settings.
             if (parsed.theme) setThemeState(parsed.theme)
+
             if (parsed.highPerformance !== undefined) setHighPerformanceState(parsed.highPerformance)
             if (parsed.showBackdrop !== undefined) setShowBackdropState(parsed.showBackdrop)
             if (parsed.showShadow !== undefined) setShowShadowState(parsed.showShadow)
             if (parsed.realTimePreview !== undefined) setRealTimePreviewState(parsed.realTimePreview)
             if (parsed.previewMode) setPreviewModeState(parsed.previewMode)
-            if (parsed.spellCheck !== undefined) setSpellCheckState(parsed.spellCheck)
+                if (parsed.showPreviewExportButton !== undefined) setShowPreviewExportButtonState(parsed.showPreviewExportButton)
+                if (parsed.previewExportButtonPosition === 'top-right' || parsed.previewExportButtonPosition === 'bottom-right') setPreviewExportButtonPositionState(parsed.previewExportButtonPosition)
+                if (parsed.spellCheck !== undefined) setSpellCheckState(parsed.spellCheck)
             if (parsed.showLineNumbers !== undefined) setShowLineNumbersState(parsed.showLineNumbers)
             if (parsed.accentColor) setAccentColorState(parseAccentColor(parsed.accentColor))
             if (parsed.customAccentColor) setCustomAccentColorState(parseCustomAccentColor(parsed.customAccentColor))
@@ -380,14 +475,19 @@ export function useSettings(): Settings & {
             try {
               const current = localStorage.getItem(SETTINGS_KEY)
               const existing = current ? JSON.parse(current) : {}
-              const merged = { ...DEFAULT_SETTINGS, ...existing, ...parsed }
+                            const merged = {
+                ...DEFAULT_SETTINGS,
+                ...sanitizeSettings(existing as Partial<Settings>),
+                ...parsed,
+              }
               localStorage.setItem(SETTINGS_KEY, JSON.stringify(merged))
+
             } catch (e) {
               console.error('Failed to save imported settings:', e)
             }
 
             resolve()
-          } catch (err) {
+                    } catch {
             reject(new Error('Invalid settings file'))
           }
         }
@@ -405,13 +505,16 @@ export function useSettings(): Settings & {
     setShowShadowState(DEFAULT_SETTINGS.showShadow)
     setRealTimePreviewState(DEFAULT_SETTINGS.realTimePreview)
     setPreviewModeState(DEFAULT_SETTINGS.previewMode)
+    setShowPreviewExportButtonState(DEFAULT_SETTINGS.showPreviewExportButton)
+    setPreviewExportButtonPositionState(DEFAULT_SETTINGS.previewExportButtonPosition)
     setSpellCheckState(DEFAULT_SETTINGS.spellCheck)
     setShowLineNumbersState(DEFAULT_SETTINGS.showLineNumbers)
     setAccentColorState(DEFAULT_SETTINGS.accentColor)
     setCustomAccentColorState(DEFAULT_SETTINGS.customAccentColor)
         setToolbarButtonOrderState(DEFAULT_SETTINGS.toolbarButtonOrder)
     setVisibleToolbarButtonsState(DEFAULT_SETTINGS.visibleToolbarButtons)
-    localStorage.setItem(SETTINGS_KEY, JSON.stringify(DEFAULT_SETTINGS))
+        localStorage.setItem(SETTINGS_KEY, JSON.stringify(copySettings(DEFAULT_SETTINGS)))
+
   }
 
   return {
@@ -421,6 +524,8 @@ export function useSettings(): Settings & {
     showShadow,
     realTimePreview,
     previewMode,
+    showPreviewExportButton,
+    previewExportButtonPosition,
     spellCheck,
     showLineNumbers,
     accentColor,
@@ -447,9 +552,17 @@ export function useSettings(): Settings & {
       setRealTimePreviewState(value)
       saveSettings({ realTimePreview: value })
     },
-    setPreviewMode: (mode: 'split' | 'separate') => {
-      setPreviewModeState(mode)
+    setPreviewMode: (mode: 'split' | 'separate' | 'in-preview') => {
+            setPreviewModeState(mode)
       saveSettings({ previewMode: mode })
+    },
+    setShowPreviewExportButton: (value: boolean) => {
+      setShowPreviewExportButtonState(value)
+      saveSettings({ showPreviewExportButton: value })
+    },
+    setPreviewExportButtonPosition: (position: 'top-right' | 'bottom-right') => {
+      setPreviewExportButtonPositionState(position)
+      saveSettings({ previewExportButtonPosition: position })
     },
     setSpellCheck: (value: boolean) => {
       setSpellCheckState(value)
