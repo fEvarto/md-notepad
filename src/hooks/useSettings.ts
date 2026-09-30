@@ -26,10 +26,14 @@ export interface Settings {
   showShadow: boolean
   realTimePreview: boolean
   previewMode: 'split' | 'separate' | 'in-preview'
+  splitDirection: 'horizontal' | 'vertical'
   showPreviewExportButton: boolean
   previewExportButtonPosition: 'top-right' | 'bottom-right'
   spellCheck: boolean
   showLineNumbers: boolean
+  showStatusBar: boolean
+  swapToolbarAndStatusBar: boolean
+  swapToolbarLayout: boolean
   accentColor: AccentColor
   customAccentColor: string
   toolbarButtonOrder: ToolbarStyleButtonId[]
@@ -43,10 +47,14 @@ export const DEFAULT_SETTINGS: Settings = {
   showShadow: true,
   realTimePreview: true,
   previewMode: 'split',
+  splitDirection: 'horizontal',
   showPreviewExportButton: false,
   previewExportButtonPosition: 'top-right',
   spellCheck: false,
   showLineNumbers: false,
+  showStatusBar: true,
+  swapToolbarAndStatusBar: false,
+  swapToolbarLayout: false,
   accentColor: 'blue',
   customAccentColor: DEFAULT_CUSTOM_ACCENT,
   toolbarButtonOrder: DEFAULT_TOOLBAR_BUTTON_ORDER,
@@ -61,6 +69,10 @@ function isTheme(value: unknown): value is Settings['theme'] {
 
 function isPreviewMode(value: unknown): value is Settings['previewMode'] {
   return value === 'split' || value === 'separate' || value === 'in-preview'
+}
+
+function isSplitDirection(value: unknown): value is Settings['splitDirection'] {
+  return value === 'horizontal' || value === 'vertical'
 }
 
 function isPreviewExportButtonPosition(value: unknown): value is Settings['previewExportButtonPosition'] {
@@ -80,6 +92,7 @@ function sanitizeSettings(input: Partial<Settings>): Partial<Settings> {
   if (typeof input.showShadow === 'boolean') sanitized.showShadow = input.showShadow
   if (typeof input.realTimePreview === 'boolean') sanitized.realTimePreview = input.realTimePreview
   if (isPreviewMode(input.previewMode)) sanitized.previewMode = input.previewMode
+  if (isSplitDirection(input.splitDirection)) sanitized.splitDirection = input.splitDirection
   if (typeof input.showPreviewExportButton === 'boolean') {
     sanitized.showPreviewExportButton = input.showPreviewExportButton
   }
@@ -88,6 +101,9 @@ function sanitizeSettings(input: Partial<Settings>): Partial<Settings> {
   }
   if (typeof input.spellCheck === 'boolean') sanitized.spellCheck = input.spellCheck
   if (typeof input.showLineNumbers === 'boolean') sanitized.showLineNumbers = input.showLineNumbers
+  if (typeof input.showStatusBar === 'boolean') sanitized.showStatusBar = input.showStatusBar
+  if (typeof input.swapToolbarAndStatusBar === 'boolean') sanitized.swapToolbarAndStatusBar = input.swapToolbarAndStatusBar
+  if (typeof input.swapToolbarLayout === 'boolean') sanitized.swapToolbarLayout = input.swapToolbarLayout
   if (typeof input.accentColor === 'string') sanitized.accentColor = parseAccentColor(input.accentColor)
   if (typeof input.customAccentColor === 'string') {
     sanitized.customAccentColor = parseCustomAccentColor(input.customAccentColor)
@@ -118,10 +134,14 @@ export function useSettings(): Settings & {
   setShowShadow: (value: boolean) => void
   setRealTimePreview: (value: boolean) => void
   setPreviewMode: (mode: 'split' | 'separate' | 'in-preview') => void
+  setSplitDirection: (direction: 'horizontal' | 'vertical') => void
   setShowPreviewExportButton: (value: boolean) => void
   setPreviewExportButtonPosition: (position: 'top-right' | 'bottom-right') => void
   setSpellCheck: (value: boolean) => void
   setShowLineNumbers: (value: boolean) => void
+  setShowStatusBar: (value: boolean) => void
+  setSwapToolbarAndStatusBar: (value: boolean) => void
+  setSwapToolbarLayout: (value: boolean) => void
   setAccentColor: (color: AccentColor) => void
   setCustomAccentColor: (hex: string) => void
   setToolbarButtonOrder: (order: ToolbarStyleButtonId[]) => void
@@ -210,6 +230,17 @@ export function useSettings(): Settings & {
     return DEFAULT_SETTINGS.previewMode
   })
 
+  const [splitDirection, setSplitDirectionState] = useState<'horizontal' | 'vertical'>(() => {
+    try {
+      const saved = localStorage.getItem(SETTINGS_KEY)
+      if (saved) {
+        const direction = (JSON.parse(saved) as Partial<Settings>).splitDirection
+        if (isSplitDirection(direction)) return direction
+      }
+    } catch (e) { console.error('Failed to load settings:', e) }
+    return DEFAULT_SETTINGS.splitDirection
+  })
+
   const [showPreviewExportButton, setShowPreviewExportButtonState] = useState<boolean>(() => {
     try {
       const saved = localStorage.getItem(SETTINGS_KEY)
@@ -242,7 +273,7 @@ export function useSettings(): Settings & {
     return DEFAULT_SETTINGS.spellCheck
   })
 
-  const [showLineNumbers, setShowLineNumbersState] = useState<boolean>(() => {
+    const [showLineNumbers, setShowLineNumbersState] = useState<boolean>(() => {
     try {
       const saved = localStorage.getItem(SETTINGS_KEY)
       if (saved) {
@@ -253,6 +284,40 @@ export function useSettings(): Settings & {
       console.error('Failed to load settings:', e)
     }
     return DEFAULT_SETTINGS.showLineNumbers
+  })
+
+  const [showStatusBar, setShowStatusBarState] = useState<boolean>(() => {
+    try {
+      const saved = localStorage.getItem(SETTINGS_KEY)
+      if (saved) {
+        const parsed = JSON.parse(saved) as Partial<Settings>
+        return parsed.showStatusBar ?? DEFAULT_SETTINGS.showStatusBar
+      }
+    } catch (e) {
+      console.error('Failed to load settings:', e)
+    }
+    return DEFAULT_SETTINGS.showStatusBar
+  })
+
+  const [swapToolbarAndStatusBar, setSwapToolbarAndStatusBarState] = useState<boolean>(() => {
+    try {
+      const saved = localStorage.getItem(SETTINGS_KEY)
+      if (saved) {
+        const parsed = JSON.parse(saved) as Partial<Settings>
+        return parsed.swapToolbarAndStatusBar ?? DEFAULT_SETTINGS.swapToolbarAndStatusBar
+      }
+    } catch (e) {
+      console.error('Failed to load settings:', e)
+    }
+    return DEFAULT_SETTINGS.swapToolbarAndStatusBar
+  })
+
+  const [swapToolbarLayout, setSwapToolbarLayoutState] = useState<boolean>(() => {
+    try {
+      const saved = localStorage.getItem(SETTINGS_KEY)
+      if (saved) return (JSON.parse(saved) as Partial<Settings>).swapToolbarLayout ?? DEFAULT_SETTINGS.swapToolbarLayout
+    } catch (e) { console.error('Failed to load settings:', e) }
+    return DEFAULT_SETTINGS.swapToolbarLayout
   })
 
   const [accentColor, setAccentColorState] = useState<AccentColor>(() => {
@@ -339,8 +404,11 @@ export function useSettings(): Settings & {
     }
     document.documentElement.setAttribute('data-preview-sync', settings.realTimePreview ? 'realtime' : 'manual')
     document.documentElement.setAttribute('data-preview-mode', settings.previewMode)
+    document.documentElement.setAttribute('data-split-direction', settings.splitDirection)
     document.documentElement.setAttribute('data-spell-check', settings.spellCheck ? 'enabled' : 'disabled')
     document.documentElement.setAttribute('data-line-numbers', settings.showLineNumbers ? 'enabled' : 'disabled')
+    document.documentElement.setAttribute('data-status-bar', settings.showStatusBar ? 'visible' : 'hidden')
+    document.documentElement.setAttribute('data-swap-toolbar-status-bar', settings.swapToolbarAndStatusBar ? 'enabled' : 'disabled')
     document.documentElement.setAttribute('data-accent-color', settings.accentColor)
     if (settings.accentColor === 'custom') {
       const primary =
@@ -378,11 +446,15 @@ export function useSettings(): Settings & {
         showShadow,
         realTimePreview,
         previewMode,
+        splitDirection,
         showPreviewExportButton,
         previewExportButtonPosition,
         spellCheck,
         showLineNumbers,
-        accentColor,
+        showStatusBar,
+                swapToolbarAndStatusBar,
+                swapToolbarLayout,
+                accentColor,
         customAccentColor,
         toolbarButtonOrder,
                 visibleToolbarButtons
@@ -397,11 +469,15 @@ export function useSettings(): Settings & {
             showShadow,
             realTimePreview,
             previewMode,
+            splitDirection,
             showPreviewExportButton,
             previewExportButtonPosition,
             spellCheck,
             showLineNumbers,
-            accentColor,
+        showStatusBar,
+                swapToolbarAndStatusBar,
+                swapToolbarLayout,
+                accentColor,
             customAccentColor,
             toolbarButtonOrder,
             visibleToolbarButtons
@@ -418,11 +494,15 @@ export function useSettings(): Settings & {
       showShadow,
       realTimePreview,
       previewMode,
+      splitDirection,
       showPreviewExportButton,
       previewExportButtonPosition,
       spellCheck,
       showLineNumbers,
-      accentColor,
+        showStatusBar,
+                swapToolbarAndStatusBar,
+                swapToolbarLayout,
+                accentColor,
       customAccentColor,
       toolbarButtonOrder,
       visibleToolbarButtons,
@@ -462,10 +542,15 @@ export function useSettings(): Settings & {
             if (parsed.showShadow !== undefined) setShowShadowState(parsed.showShadow)
             if (parsed.realTimePreview !== undefined) setRealTimePreviewState(parsed.realTimePreview)
             if (parsed.previewMode) setPreviewModeState(parsed.previewMode)
+            if (parsed.splitDirection) setSplitDirectionState(parsed.splitDirection)
+
                 if (parsed.showPreviewExportButton !== undefined) setShowPreviewExportButtonState(parsed.showPreviewExportButton)
                 if (parsed.previewExportButtonPosition === 'top-right' || parsed.previewExportButtonPosition === 'bottom-right') setPreviewExportButtonPositionState(parsed.previewExportButtonPosition)
                 if (parsed.spellCheck !== undefined) setSpellCheckState(parsed.spellCheck)
             if (parsed.showLineNumbers !== undefined) setShowLineNumbersState(parsed.showLineNumbers)
+            if (parsed.showStatusBar !== undefined) setShowStatusBarState(parsed.showStatusBar)
+            if (parsed.swapToolbarAndStatusBar !== undefined) setSwapToolbarAndStatusBarState(parsed.swapToolbarAndStatusBar)
+            if (parsed.swapToolbarLayout !== undefined) setSwapToolbarLayoutState(parsed.swapToolbarLayout)
             if (parsed.accentColor) setAccentColorState(parseAccentColor(parsed.accentColor))
             if (parsed.customAccentColor) setCustomAccentColorState(parseCustomAccentColor(parsed.customAccentColor))
             if (parsed.toolbarButtonOrder) setToolbarButtonOrderState(parseToolbarButtonOrder(parsed.toolbarButtonOrder))
@@ -505,10 +590,15 @@ export function useSettings(): Settings & {
     setShowShadowState(DEFAULT_SETTINGS.showShadow)
     setRealTimePreviewState(DEFAULT_SETTINGS.realTimePreview)
     setPreviewModeState(DEFAULT_SETTINGS.previewMode)
+    setSplitDirectionState(DEFAULT_SETTINGS.splitDirection)
+
     setShowPreviewExportButtonState(DEFAULT_SETTINGS.showPreviewExportButton)
     setPreviewExportButtonPositionState(DEFAULT_SETTINGS.previewExportButtonPosition)
     setSpellCheckState(DEFAULT_SETTINGS.spellCheck)
     setShowLineNumbersState(DEFAULT_SETTINGS.showLineNumbers)
+    setShowStatusBarState(DEFAULT_SETTINGS.showStatusBar)
+    setSwapToolbarAndStatusBarState(DEFAULT_SETTINGS.swapToolbarAndStatusBar)
+    setSwapToolbarLayoutState(DEFAULT_SETTINGS.swapToolbarLayout)
     setAccentColorState(DEFAULT_SETTINGS.accentColor)
     setCustomAccentColorState(DEFAULT_SETTINGS.customAccentColor)
         setToolbarButtonOrderState(DEFAULT_SETTINGS.toolbarButtonOrder)
@@ -524,11 +614,15 @@ export function useSettings(): Settings & {
     showShadow,
     realTimePreview,
     previewMode,
+    splitDirection,
     showPreviewExportButton,
     previewExportButtonPosition,
     spellCheck,
     showLineNumbers,
-    accentColor,
+        showStatusBar,
+                swapToolbarAndStatusBar,
+                swapToolbarLayout,
+                accentColor,
     customAccentColor,
         toolbarButtonOrder,
     visibleToolbarButtons,
@@ -552,9 +646,13 @@ export function useSettings(): Settings & {
       setRealTimePreviewState(value)
       saveSettings({ realTimePreview: value })
     },
-    setPreviewMode: (mode: 'split' | 'separate' | 'in-preview') => {
-            setPreviewModeState(mode)
+        setPreviewMode: (mode: 'split' | 'separate' | 'in-preview') => {
+      setPreviewModeState(mode)
       saveSettings({ previewMode: mode })
+    },
+    setSplitDirection: (direction: 'horizontal' | 'vertical') => {
+      setSplitDirectionState(direction)
+      saveSettings({ splitDirection: direction })
     },
     setShowPreviewExportButton: (value: boolean) => {
       setShowPreviewExportButtonState(value)
@@ -568,9 +666,21 @@ export function useSettings(): Settings & {
       setSpellCheckState(value)
       saveSettings({ spellCheck: value })
     },
-    setShowLineNumbers: (value: boolean) => {
+        setShowLineNumbers: (value: boolean) => {
       setShowLineNumbersState(value)
       saveSettings({ showLineNumbers: value })
+    },
+        setShowStatusBar: (value: boolean) => {
+      setShowStatusBarState(value)
+      saveSettings({ showStatusBar: value })
+    },
+        setSwapToolbarAndStatusBar: (value: boolean) => {
+      setSwapToolbarAndStatusBarState(value)
+      saveSettings({ swapToolbarAndStatusBar: value })
+    },
+    setSwapToolbarLayout: (value: boolean) => {
+      setSwapToolbarLayoutState(value)
+      saveSettings({ swapToolbarLayout: value })
     },
     setAccentColor: (color: AccentColor) => {
       setAccentColorState(color)

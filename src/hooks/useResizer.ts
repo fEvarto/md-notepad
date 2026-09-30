@@ -1,9 +1,11 @@
 import { useCallback } from 'react'
 
 export function useResizer(
-  editorSize: number,
+    editorSize: number,
   setEditorSize: (size: number) => void,
-  containerRef: React.RefObject<HTMLDivElement | null>
+  containerRef: React.RefObject<HTMLDivElement | null>,
+  splitDirection: 'horizontal' | 'vertical'
+
 ): {
   handleSeparatorMouseDown: (e: React.MouseEvent) => void
   handleSeparatorTouchStart: (e: React.TouchEvent) => void
@@ -16,18 +18,19 @@ export function useResizer(
     if (!container) return
     const containerWidth = container.offsetWidth
     const containerHeight = container.offsetHeight
-    const isColumn = window.matchMedia('(max-width: 768px)').matches
+        const isColumn = window.matchMedia('(max-width: 768px)').matches
+    const isSwapped = splitDirection === 'vertical'
 
     const handleMouseMove = (moveEvent: MouseEvent) => {
       if (isColumn) {
         const delta = moveEvent.clientY - startY
         const deltaPercent = (delta / containerHeight) * 100
-        const newSize = Math.max(20, Math.min(80, startSize + deltaPercent))
+                const newSize = Math.max(20, Math.min(80, startSize + (isSwapped ? -deltaPercent : deltaPercent)))
         setEditorSize(newSize)
       } else {
         const delta = moveEvent.clientX - startX
         const deltaPercent = (delta / containerWidth) * 100
-        const newSize = Math.max(20, Math.min(80, startSize + deltaPercent))
+        const newSize = Math.max(20, Math.min(80, startSize + (isSwapped ? -deltaPercent : deltaPercent)))
         setEditorSize(newSize)
       }
     }
@@ -39,7 +42,7 @@ export function useResizer(
 
     document.addEventListener('mousemove', handleMouseMove)
     document.addEventListener('mouseup', handleMouseUp)
-  }, [editorSize, setEditorSize, containerRef])
+  }, [editorSize, setEditorSize, containerRef, splitDirection])
 
   const handleSeparatorTouchStart = useCallback((e: React.TouchEvent) => {
     if (!e.touches || e.touches.length === 0) return
@@ -51,7 +54,8 @@ export function useResizer(
     if (!container) return
     const containerWidth = container.offsetWidth
     const containerHeight = container.offsetHeight
-    const isColumn = window.matchMedia('(max-width: 768px)').matches
+        const isColumn = window.matchMedia('(max-width: 768px)').matches
+    const isSwapped = splitDirection === 'vertical'
 
     const handleTouchMove = (moveEvent: TouchEvent) => {
       moveEvent.preventDefault()
@@ -60,12 +64,12 @@ export function useResizer(
       if (isColumn) {
         const delta = t.clientY - startY
         const deltaPercent = (delta / containerHeight) * 100
-        const newSize = Math.max(20, Math.min(80, startSize + deltaPercent))
+                const newSize = Math.max(20, Math.min(80, startSize + (isSwapped ? -deltaPercent : deltaPercent)))
         setEditorSize(newSize)
       } else {
         const delta = t.clientX - startX
         const deltaPercent = (delta / containerWidth) * 100
-        const newSize = Math.max(20, Math.min(80, startSize + deltaPercent))
+        const newSize = Math.max(20, Math.min(80, startSize + (isSwapped ? -deltaPercent : deltaPercent)))
         setEditorSize(newSize)
       }
     }
@@ -77,7 +81,7 @@ export function useResizer(
 
     document.addEventListener('touchmove', handleTouchMove, { passive: false })
     document.addEventListener('touchend', handleTouchEnd)
-  }, [editorSize, setEditorSize, containerRef])
+  }, [editorSize, setEditorSize, containerRef, splitDirection])
 
   return {
     handleSeparatorMouseDown,

@@ -54,7 +54,7 @@
   padding: 1rem;
   box-sizing: border-box;
   scrollbar-gutter: stable;
-  line-height: 2.66;
+  line-height: 1.6;
   word-wrap: break-word;
   -webkit-hyphens: auto;
   hyphens: auto;
@@ -129,6 +129,311 @@
 
 .preview h1 {
   font-size: 2em;
+}
+
+/* Reserve source-marker width everywhere; reveal it only at the caret. */
+.preview--editable .markdown-syntax-heading--1::before { content: '# '; }
+.preview--editable .markdown-syntax-heading--2::before { content: '## '; }
+.preview--editable .markdown-syntax-heading--3::before { content: '### '; }
+.preview--editable .markdown-syntax-heading--4::before { content: '#### '; }
+.preview--editable .markdown-syntax-heading--5::before { content: '##### '; }
+.preview--editable .markdown-syntax-heading--6::before { content: '###### '; }
+.preview--editable .markdown-syntax-strong::before,
+.preview--editable .markdown-syntax-strong::after { content: '**'; }
+.preview--editable .markdown-syntax-em::before,
+.preview--editable .markdown-syntax-em::after { content: '*'; }
+.preview--editable .markdown-syntax-code:not(pre code)::before,
+.preview--editable .markdown-syntax-code:not(pre code)::after { content: '`'; }
+.preview--editable .spoiler::before,
+.preview--editable .spoiler::after { content: '||'; }
+.preview--editable .markdown-syntax-blockquote::before { content: '> '; }
+.preview--editable .markdown-syntax-list-item::before { content: '- '; }
+.preview--editable .markdown-syntax-link::before { content: '['; }
+.preview--editable .markdown-syntax-link::after { content: '](' attr(href) ')'; }
+.preview--editable .markdown-syntax-image::after { content: '![' attr(alt) '](' attr(src) ')'; }
+.preview--editable .markdown-syntax-heading::before,
+.preview--editable .markdown-syntax-strong::before,
+.preview--editable .markdown-syntax-strong::after,
+.preview--editable .markdown-syntax-em::before,
+.preview--editable .markdown-syntax-em::after,
+.preview--editable .markdown-syntax-code::before,
+.preview--editable .markdown-syntax-code::after,
+.preview--editable .markdown-syntax-blockquote::before,
+.preview--editable .markdown-syntax-list-item::before,
+.preview--editable .markdown-syntax-link::before,
+.preview--editable .markdown-syntax-link::after,
+.preview--editable .markdown-syntax-image::after {
+  font-family: inherit;
+  font-size: 1em;
+  font-weight: 400;
+  font-style: normal;
+  letter-spacing: normal;
+}
+.preview--editable .markdown-syntax-heading::before,
+.preview--editable .markdown-syntax-strong::before,
+.preview--editable .markdown-syntax-strong::after,
+.preview--editable .markdown-syntax-em::before,
+.preview--editable .markdown-syntax-em::after,
+.preview--editable .markdown-syntax-code:not(pre code)::before,
+.preview--editable .markdown-syntax-code:not(pre code)::after,
+.preview--editable .markdown-syntax-blockquote::before,
+.preview--editable .markdown-syntax-list-item::before,
+.preview--editable .markdown-syntax-link::before,
+.preview--editable .markdown-syntax-link::after,
+.preview--editable .markdown-syntax-image::after {
+  visibility: hidden;
+}
+
+.preview--editable:focus-within .markdown-syntax-active::before,
+.preview--editable:focus-within .markdown-syntax-active::after {
+  visibility: visible;
+}
+
+.preview--editable .spoiler::before,
+.preview--editable .spoiler::after {
+  visibility: hidden;
+}
+
+.preview--editable:focus-within.preview--active-spoiler .spoiler::before,
+.preview--editable:focus-within.preview--active-spoiler .spoiler::after {
+  visibility: visible;
+}
+
+.preview--editable .preview-editor-rendered p,
+.preview--editable .preview-editor-rendered h1,
+.preview--editable .preview-editor-rendered h2,
+.preview--editable .preview-editor-rendered h3,
+.preview--editable .preview-editor-rendered h4,
+.preview--editable .preview-editor-rendered h5,
+.preview--editable .preview-editor-rendered h6,
+.preview--editable .preview-editor-rendered blockquote,
+.preview--editable .preview-editor-rendered ul,
+.preview--editable .preview-editor-rendered ol,
+.preview--editable .preview-editor-rendered pre,
+.preview--editable .preview-editor-rendered table {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.preview--editable .preview-editor-rendered h1,
+.preview--editable .preview-editor-rendered h2,
+.preview--editable .preview-editor-rendered h3,
+.preview--editable .preview-editor-rendered h4,
+.preview--editable .preview-editor-rendered h5,
+.preview--editable .preview-editor-rendered h6 {
+  font-size: inherit;
+  line-height: inherit;
+}
+
+/* The rendered layer and transparent source textarea must use identical glyph
+   metrics. Formatting is visual here; it must not move the source caret. */
+.preview--editable .preview-editor-rendered {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, 'Roboto Mono', 'Segoe UI Mono', monospace;
+  font-size: 16px;
+  font-weight: 400;
+  font-style: normal;
+  line-height: 1.6;
+  letter-spacing: normal;
+  font-synthesis: none;
+}
+
+.preview--editable .preview-editor-rendered * {
+  font-family: inherit !important;
+  font-size: inherit !important;
+  letter-spacing: inherit !important;
+  line-height: inherit !important;
+}
+
+.preview--editable .preview-editor-rendered strong {
+  font-weight: 400;
+  text-shadow: 0.35px 0 currentColor;
+}
+
+.preview--editable .preview-editor-rendered em {
+  font-style: italic;
+  text-decoration: none;
+}
+.preview--editable .preview-editor-rendered p,
+.preview--editable .preview-editor-rendered li,
+.preview--editable .preview-editor-rendered blockquote { line-height: 1.6; }
+
+.preview--editable .preview-editor-rendered li {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.preview--editable:focus-within .markdown-syntax-strong.markdown-syntax-active::before,
+.preview--editable:focus-within .markdown-syntax-strong.markdown-syntax-active::after { content: '**'; }
+.preview--editable:focus-within .markdown-syntax-em.markdown-syntax-active::before,
+.preview--editable:focus-within .markdown-syntax-em.markdown-syntax-active::after { content: '*'; }
+.preview--editable:focus-within .markdown-syntax-code.markdown-syntax-active:not(pre code)::before,
+.preview--editable:focus-within .markdown-syntax-code.markdown-syntax-active:not(pre code)::after { content: '`'; }
+.preview--editable .spoiler::before,
+.preview--editable .spoiler::after { content: '||'; }
+.preview--editable:focus-within.preview--active-spoiler .spoiler {
+  background: transparent;
+  color: inherit;
+  padding: 0;
+  user-select: text;
+}
+.preview--editable .markdown-syntax-list {
+  list-style: none;
+  padding-left: 0;
+}
+
+.preview--editable .markdown-syntax-blockquote {
+  padding-left: 0;
+}
+
+.preview--editable .markdown-syntax-table {
+  table-layout: auto;
+  line-height: 1.6;
+}
+
+.preview--editable .markdown-syntax-table-cell {
+  line-height: 1.6;
+}
+
+.preview--editable .markdown-syntax-table th,
+.preview--editable .markdown-syntax-table td {
+  height: 25.6px;
+  padding: 0;
+  border: 0;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+  box-sizing: border-box;
+}
+
+.preview--editable .markdown-syntax-table th {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.preview--editable .markdown-syntax-table-cell-content {
+  display: inline-block;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, 'Roboto Mono', 'Segoe UI Mono', monospace !important;
+  font-size: 16px !important;
+  font-weight: 400;
+  font-style: normal;
+  line-height: 1.6 !important;
+  letter-spacing: normal !important;
+}
+
+.preview--editable .markdown-syntax-table tr {
+  height: 1.6em;
+}
+
+.preview--editable .markdown-syntax-table-separator {
+  visibility: hidden;
+}
+
+.preview--editable .markdown-syntax-table-separator tr,
+.preview--editable .markdown-syntax-table-separator td {
+  height: 25.6px;
+  padding: 0;
+  border: 0;
+  line-height: 25.6px;
+}
+
+.preview--editable .markdown-syntax-table-cell::before,
+.preview--editable .markdown-syntax-table-cell::after {
+  content: '| ';
+  font: inherit;
+  font-weight: 400;
+  visibility: hidden;
+}
+
+.preview--editable .markdown-syntax-table-cell::after {
+  content: ' |';
+}
+
+.preview--editable:focus-within .markdown-syntax-table-cell.markdown-syntax-active::before,
+.preview--editable:focus-within .markdown-syntax-table-cell.markdown-syntax-active::after {
+  visibility: visible;
+}
+
+.preview--editable .markdown-syntax-list--ordered .markdown-syntax-list-item::before {
+  content: counter(list-item) '. ';
+}
+
+.preview--editable .markdown-syntax-image {
+  width: 0;
+  height: 0;
+  opacity: 0;
+}
+
+.preview--editable .markdown-syntax-image-source {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, 'Roboto Mono', 'Segoe UI Mono', monospace;
+  font-size: 16px;
+  font-weight: 400;
+  font-style: normal;
+  line-height: 1.6;
+  letter-spacing: normal;
+}
+
+.preview--editable .markdown-syntax-image::after {
+  display: inline-block;
+  opacity: 1;
+  white-space: nowrap;
+}
+
+.preview--editable .markdown-blank-line {
+  display: block;
+  height: 1.6em;
+}
+
+.preview--editable .markdown-syntax-code-source,
+.preview--editable .markdown-syntax-table-source,
+.preview--editable .markdown-syntax-fenced {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, 'Roboto Mono', 'Segoe UI Mono', monospace;
+  font-size: 16px;
+  font-weight: 400;
+  font-style: normal;
+  line-height: 1.6;
+  letter-spacing: normal;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.preview--editable .markdown-syntax-table-source {
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, currentColor 25%, transparent);
+  background: color-mix(in srgb, currentColor 4%, transparent);
+}
+
+.preview--editable .markdown-syntax-fenced {
+  background: transparent;
+}
+
+.preview--editable .markdown-syntax-fenced::before,
+.preview--editable .markdown-syntax-fenced::after {
+  display: block;
+  height: 25.6px;
+  line-height: 25.6px;
+  visibility: hidden;
+}
+
+.preview--editable .markdown-syntax-fenced::before {
+  content: attr(data-opening-fence);
+}
+
+.preview--editable .markdown-syntax-fenced::after {
+  content: attr(data-closing-fence);
+}
+
+.preview--editable .markdown-syntax-fenced > .markdown-syntax-code-block > div {
+  margin: 0 !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  line-height: 25.6px !important;
+}
+
+.preview--editable .markdown-syntax-fenced .markdown-syntax-code-block,
+.preview--editable .markdown-syntax-fenced .markdown-syntax-code-block * {
+  line-height: 25.6px !important;
 }
 
 .preview h2 {

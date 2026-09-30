@@ -44,6 +44,7 @@ interface ToolbarProps {
   onInfoClick: () => void
   wrapToggleFeedback: 'bold' | 'italic' | 'code' | 'spoiler' | null
   activeStyles?: ToolbarStyleButtonId[]
+  swapLayout?: boolean
 }
 
 function renderStyleButton(
@@ -119,7 +120,7 @@ function renderStyleButton(
       )
     case 'link':
       return (
-        <button key={id} type="button" title="Link" onClick={actions.onLink} aria-label="Link">
+        <button key={id} type="button" title="Link" onClick={actions.onLink} aria-label="Link" className={activeStyles.includes('link') ? 'active' : ''}>
           <span className="toolbar-icon" aria-hidden="true">
             <LinkIcon />
           </span>
@@ -128,7 +129,7 @@ function renderStyleButton(
       )
     case 'image':
       return (
-        <button key={id} type="button" title="Image" onClick={actions.onImage} aria-label="Image">
+        <button key={id} type="button" title="Image" onClick={actions.onImage} aria-label="Image" className={activeStyles.includes('image') ? 'active' : ''}>
           <span className="toolbar-icon" aria-hidden="true">
             <ImageIcon />
           </span>
@@ -137,7 +138,7 @@ function renderStyleButton(
       )
     case 'h1':
       return (
-        <button key={id} type="button" title="H1" onClick={actions.onH1} aria-label="Heading 1">
+        <button key={id} type="button" title="H1" onClick={actions.onH1} aria-label="Heading 1" className={activeStyles.includes('h1') ? 'active' : ''}>
           <span className="toolbar-icon" aria-hidden="true">
             <HeadingIcon />
           </span>
@@ -146,7 +147,7 @@ function renderStyleButton(
       )
     case 'h2':
       return (
-        <button key={id} type="button" title="H2" onClick={actions.onH2} aria-label="Heading 2">
+        <button key={id} type="button" title="H2" onClick={actions.onH2} aria-label="Heading 2" className={activeStyles.includes('h2') ? 'active' : ''}>
           <span className="toolbar-icon" aria-hidden="true">
             <Heading2Icon />
           </span>
@@ -155,7 +156,7 @@ function renderStyleButton(
       )
     case 'list':
       return (
-        <button key={id} type="button" title="List" onClick={actions.onList} aria-label="Bullet list">
+        <button key={id} type="button" title="List" onClick={actions.onList} aria-label="Bullet list" className={activeStyles.includes('list') ? 'active' : ''}>
           <span className="toolbar-icon" aria-hidden="true">
             <ListIcon />
           </span>
@@ -164,7 +165,7 @@ function renderStyleButton(
       )
     case 'blockquote':
       return (
-        <button key={id} type="button" title="Blockquote" onClick={actions.onBlockquote} aria-label="Blockquote">
+        <button key={id} type="button" title="Blockquote" onClick={actions.onBlockquote} aria-label="Blockquote" className={activeStyles.includes('blockquote') ? 'active' : ''}>
           <span className="toolbar-icon" aria-hidden="true">
             <BlockquoteIcon />
           </span>
@@ -173,7 +174,7 @@ function renderStyleButton(
       )
     case 'codeBlock':
       return (
-        <button key={id} type="button" title="Code block" onClick={actions.onCodeBlock} aria-label="Code block">
+        <button key={id} type="button" title="Code block" onClick={actions.onCodeBlock} aria-label="Code block" className={activeStyles.includes('codeBlock') ? 'active' : ''}>
           <span className="toolbar-icon" aria-hidden="true">
             <CodeBlockIcon />
           </span>
@@ -182,7 +183,7 @@ function renderStyleButton(
       )
     case 'table':
       return (
-        <button key={id} type="button" title="Table" onClick={actions.onTable} aria-label="Table">
+        <button key={id} type="button" title="Table" onClick={actions.onTable} aria-label="Table" className={activeStyles.includes('table') ? 'active' : ''}>
           <span className="toolbar-icon" aria-hidden="true">
             <TableIcon />
           </span>
@@ -203,48 +204,53 @@ export function Toolbar({
   totalStyleButtonsCount,
   actions,
   onInfoClick,
-  wrapToggleFeedback,
+    wrapToggleFeedback,
   activeStyles = [],
+  swapLayout = false,
 }: ToolbarProps): React.JSX.Element {
   const hiddenCount = totalStyleButtonsCount - visibleButtons.length
 
   return (
-    <div className="toolbar">
-      {visibleButtons.map((id) => renderStyleButton(id, actions, wrapToggleFeedback, activeStyles))}
-      {hiddenCount > 0 && (
-        <button
-          type="button"
-          className="toolbar-overflow-indicator"
-          title={`${hiddenCount} more button${hiddenCount === 1 ? '' : 's'} available — open settings to customize`}
-          aria-label={`${hiddenCount} more toolbar buttons hidden`}
-          onClick={onInfoClick}
-        >
-          <span className="toolbar-icon toolbar-overflow-icon" aria-hidden="true">+{hiddenCount}</span>
-          <Tooltip text={`${hiddenCount} more — open settings`} />
-        </button>
-      )}
+        <div className={`toolbar${swapLayout ? ' toolbar-swapped' : ''}`}>
+      <div className="toolbar-style-buttons">
+        {visibleButtons.map((id) => renderStyleButton(id, actions, wrapToggleFeedback, activeStyles))}
+        {hiddenCount > 0 && (
+          <button
+            type="button"
+            className="toolbar-overflow-indicator"
+            title={`${hiddenCount} more button${hiddenCount === 1 ? '' : 's'} available — open settings to customize`}
+            aria-label={`${hiddenCount} more toolbar buttons hidden`}
+            onClick={onInfoClick}
+          >
+            <span className="toolbar-icon toolbar-overflow-icon" aria-hidden="true">+{hiddenCount}</span>
+            <Tooltip text={`${hiddenCount} more — open settings`} />
+          </button>
+        )}
+      </div>
       <div className="spacer" />
-      <input
-        className="filename-input"
-        value={filename}
-        onChange={(e) => onFilenameChange(e.target.value)}
-        aria-label="Filename for export"
-        placeholder="note.md"
-      />
-            {showExportButton && (
-        <button type="button" className="primary" onClick={() => onExport(filename)} aria-label="Export note">
-          <span className="toolbar-icon toolbar-icon-primary" aria-hidden="true">
-            <ExportIcon />
+      <div className="toolbar-meta">
+        <input
+          className="filename-input"
+          value={filename}
+          onChange={(e) => onFilenameChange(e.target.value)}
+          aria-label="Filename for export"
+          placeholder="note.md"
+        />
+        {showExportButton && (
+          <button type="button" className="primary" onClick={() => onExport(filename)} aria-label="Export note">
+            <span className="toolbar-icon toolbar-icon-primary" aria-hidden="true">
+              <ExportIcon />
+            </span>
+            <Tooltip text="Export current note" keybind="Ctrl/Cmd+S" />
+          </button>
+        )}
+        <button type="button" title="Info" onClick={onInfoClick} aria-label="Open info and settings">
+          <span className="toolbar-icon" aria-hidden="true">
+            <InfoIcon />
           </span>
-          <Tooltip text="Export current note" keybind="Ctrl/Cmd+S" />
+          <Tooltip text="Open settings" />
         </button>
-      )}
-      <button type="button" title="Info" onClick={onInfoClick} aria-label="Open info and settings">
-        <span className="toolbar-icon" aria-hidden="true">
-          <InfoIcon />
-        </span>
-        <Tooltip text="Open settings" />
-      </button>
+      </div>
     </div>
   )
 }

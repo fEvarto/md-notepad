@@ -24,14 +24,22 @@ interface InfoModalProps {
   onRealTimePreviewChange: (value: boolean) => void
     previewMode: 'split' | 'separate' | 'in-preview'
   onPreviewModeChange: (mode: 'split' | 'separate' | 'in-preview') => void
+  splitDirection: 'horizontal' | 'vertical'
+  onSplitDirectionChange: (direction: 'horizontal' | 'vertical') => void
   showPreviewExportButton: boolean
   onShowPreviewExportButtonChange: (value: boolean) => void
   previewExportButtonPosition: 'top-right' | 'bottom-right'
   onPreviewExportButtonPositionChange: (position: 'top-right' | 'bottom-right') => void
   spellCheck: boolean
   onSpellCheckChange: (value: boolean) => void
-  showLineNumbers: boolean
+    showLineNumbers: boolean
   onShowLineNumbersChange: (value: boolean) => void
+    showStatusBar: boolean
+  onShowStatusBarChange: (value: boolean) => void
+    swapToolbarAndStatusBar: boolean
+  onSwapToolbarAndStatusBarChange: (value: boolean) => void
+  swapToolbarLayout: boolean
+  onSwapToolbarLayoutChange: (value: boolean) => void
   accentColor: AccentColor
   customAccentColor: string
   onAccentColorChange: (color: AccentColor) => void
@@ -60,16 +68,24 @@ export function InfoModal({
   onShowShadowChange,
   realTimePreview,
   onRealTimePreviewChange,
-    previewMode,
+        previewMode,
   onPreviewModeChange,
+  splitDirection,
+  onSplitDirectionChange,
   showPreviewExportButton,
   onShowPreviewExportButtonChange,
   previewExportButtonPosition,
   onPreviewExportButtonPositionChange,
   spellCheck,
   onSpellCheckChange,
-  showLineNumbers,
+    showLineNumbers,
   onShowLineNumbersChange,
+    showStatusBar,
+  onShowStatusBarChange,
+    swapToolbarAndStatusBar,
+  onSwapToolbarAndStatusBarChange,
+  swapToolbarLayout,
+  onSwapToolbarLayoutChange,
   accentColor,
   customAccentColor,
   onAccentColorChange,
@@ -393,7 +409,7 @@ export function InfoModal({
                   />
                   <span className="checkbox-label">Enable Spell Checking</span>
                 </label>
-                <label className="setting-item">
+                                <label className="setting-item">
                   <input
                     type="checkbox"
                     checked={showLineNumbers}
@@ -402,6 +418,38 @@ export function InfoModal({
                   />
                   <span className="checkbox-label">Show Line Numbers</span>
                 </label>
+              </div>
+
+              <h3>Toolbar and Status Bar</h3>
+              <div className="settings-group">
+                <label className="setting-item">
+                  <input
+                    type="checkbox"
+                    checked={showStatusBar}
+                    onChange={(e) => onShowStatusBarChange(e.target.checked)}
+                    className="checkbox-input"
+                  />
+                  <span className="checkbox-label">Show Status Bar</span>
+                </label>
+                <label className="setting-item">
+                  <input
+                    type="checkbox"
+                    checked={swapToolbarAndStatusBar}
+                    onChange={(e) => onSwapToolbarAndStatusBarChange(e.target.checked)}
+                    className="checkbox-input"
+                  />
+                                    <span className="checkbox-label">Swap Toolbar and Status Bar</span>
+                  </label>
+                  <label className="setting-item">
+                    <input
+                      type="checkbox"
+                      checked={swapToolbarLayout}
+                      onChange={(e) => onSwapToolbarLayoutChange(e.target.checked)}
+                      className="checkbox-input"
+                    />
+                    <span className="checkbox-label">Swap Toolbar Layout</span>
+                  </label>
+                  <small>Move info, export, and filename to the left and markdown buttons to the right.</small>
               </div>
 
               <h3>Preview Layout</h3>
@@ -434,9 +482,22 @@ export function InfoModal({
                       onChange={() => onPreviewModeChange('in-preview')}
                       className="checkbox-input"
                     />
-                    <span className="checkbox-label">In-preview editing (beta)</span>
+                    <span className="checkbox-label">In-preview editing</span>
                 </label>
                 <small>Split mode shows editor and preview side-by-side. Separate mode swaps the main area between editor and preview. In-preview editing combines both panes so formatting is visible while you type.</small>
+                <label className="setting-item" style={{ marginTop: '0.75rem' }}>
+                  <span className="checkbox-label">Panes split order</span>
+                  <select
+                    value={splitDirection}
+                    onChange={(e) => onSplitDirectionChange(e.target.value as 'horizontal' | 'vertical')}
+                    className="theme-select"
+                    disabled={previewMode !== 'split'}
+                  >
+                    <option value="horizontal">Standard</option>
+                    <option value="vertical">Inverted</option>
+                  </select>
+                </label>
+                <small>This option affects desktop split mode only</small>
                 <label className="setting-item">
                   <input
                     type="checkbox"

@@ -7,6 +7,34 @@
   overflow: hidden;
 }
 
+.editor-app[data-swap-toolbar-status-bar="enabled"] > .toolbar {
+  order: 3;
+  margin: 0 5px 5px 5px;
+}
+
+.editor-app[data-swap-toolbar-status-bar="enabled"] > .status-bar {
+  order: 1;
+  margin: 5px 5px 0 5px;
+}
+
+.editor-app[data-swap-toolbar-status-bar="enabled"] > .editor-main,
+.editor-app[data-swap-toolbar-status-bar="enabled"] > .in-preview-editor,
+.editor-app[data-swap-toolbar-status-bar="enabled"] > .preview.central {
+  order: 2;
+}
+
+@media (max-width: 600px) {
+  .editor-app[data-swap-toolbar-status-bar="enabled"] > .status-bar {
+    margin: 3px 3px 0 3px;
+  }
+}
+
+@media (max-width: 480px) {
+  .editor-app[data-swap-toolbar-status-bar="enabled"] > .status-bar {
+    margin: 2px 2px 0 2px;
+  }
+}
+
 .editor-main {
   display: flex;
   gap: 0;
@@ -14,11 +42,29 @@
   min-height: 0;
 }
 
+/* Alternate order: preview first, editor second. This applies to both
+   horizontal desktop splits and vertical mobile splits. */
+:root[data-split-direction="vertical"] .editor-main > .preview {
+  order: 1;
+}
+
+:root[data-split-direction="vertical"] .editor-main > .separator {
+  order: 2;
+}
+
+:root[data-split-direction="vertical"] .editor-main > .editor-textarea,
+:root[data-split-direction="vertical"] .editor-main > .editor-line-numbers {
+  order: 3;
+}
+
 .separator {
+  position: relative;
+  z-index: 2;
   width: 7px;
   height: 100%;
   background: rgba(255, 255, 255, 0.04);
   cursor: col-resize;
+  touch-action: none;
   flex: 0 0 7px;
   margin: 0 -3px;
   transition: background 200ms ease;
@@ -69,10 +115,12 @@
   background: transparent;
   color: transparent;
   caret-color: var(--accent-primary, #667eea);
-  font: inherit;
-  font-family: inherit;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, 'Roboto Mono', 'Segoe UI Mono', monospace;
+  font-size: 16px;
+  font-weight: 400;
+  font-style: normal;
   line-height: 1.6;
-  letter-spacing: inherit;
+  letter-spacing: normal;
   padding: 0;
   box-sizing: border-box;
   overflow: auto;

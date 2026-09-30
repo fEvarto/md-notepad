@@ -15,11 +15,49 @@ export interface PatchEntry {
 
 export const patchNotes: PatchNote[] = [
   {
+    version: '2.2.0',
+    title: 'The Modulo Zero',
+    date: 'October 2026',
+    defaultOpen: true,
+    badges: ['current'],
+    entries: [
+      {
+        badge: 'major',
+        title: 'In-preview editor, part II:',
+        description: 'greatly improved in-preview editor experience: now user can almost freely edit text in the preview pane'
+      },
+      {
+        badge: 'new',
+        title: 'Left-handed mode:',
+        description: 'added new option that allows swapping toolbar buttons and export parts on the toolbar for better comfortability'
+      },
+      {
+        badge: 'new',
+        title: 'Status bar is optional:',
+        description: 'added new option that allows hiding the status bar. Options that are in reach from the status bar are still present in modal window'
+      },
+      {
+        badge: 'new',
+        title: 'Swappable panes and bars:',
+        description: 'added two new options: one swaps editor and preview panes in split mode, another swaps toolbar and status bar'
+      },
+      {
+        badge: 'improved',
+        title: 'Toolbar highlighting:',
+        description: 'now all toolbar buttons are highlighted when they are applied to selected text, not only wrap style buttons'
+      },
+      {
+        badge: 'improved',
+        title: 'Bugfixes:',
+        description: 'Fixed some bugs and visual issues occurred in previous updates'
+      }
+    ]
+  },
+  {
     version: '2.1.0',
     title: 'Le Idée Fixe',
     date: 'September 2026',
-    defaultOpen: true,
-    badges: ['current'],
+    badges: [],
     entries: [
       {
         badge: 'major',

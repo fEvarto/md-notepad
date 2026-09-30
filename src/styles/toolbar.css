@@ -14,9 +14,39 @@
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
 }
 
+.toolbar-style-buttons,
+.toolbar-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.toolbar-style-buttons {
+  order: 1;
+}
+
 .toolbar .spacer {
+  order: 2;
   flex: 1 1 auto;
 }
+
+.toolbar-meta {
+  order: 3;
+}
+
+.toolbar.toolbar-swapped .toolbar-meta {
+  order: 1;
+  flex-direction: row-reverse;
+}
+
+.toolbar.toolbar-swapped .spacer {
+  order: 2;
+}
+
+.toolbar.toolbar-swapped .toolbar-style-buttons {
+  order: 3;
+}
+
 
 .toolbar button {
   padding: 0.35rem 0.35rem;
@@ -138,7 +168,7 @@
 }
 
 .filename-input {
-  margin-left: auto;
+
   padding: 0.4rem 0.6rem;
   border-radius: 6px;
   border: 1px solid rgba(212, 212, 212, 0.2);
